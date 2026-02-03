@@ -7,3 +7,4 @@
 
 Исходный код программы содержится в GitHub-репозитории:
 #box(underline(link("https://github.com/kotfind/usb-password-manager"))).
+*Обратите внимание, что в репозитории содержится несколько веток.*
