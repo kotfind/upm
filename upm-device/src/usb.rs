@@ -1,7 +1,11 @@
 use core::fmt::Write;
 
 use embassy_executor::Spawner;
-use embassy_rp::{Peri, bind_interrupts, peripherals::USB, usb};
+use embassy_rp::{
+    Peri, bind_interrupts,
+    peripherals::USB,
+    usb::{self, Endpoint},
+};
 use embassy_time::Instant;
 use embassy_usb::{
     UsbDevice,
@@ -18,7 +22,10 @@ bind_interrupts!(struct Irqs {
 pub async fn init(
     spawner: Spawner,
     usb: Peri<'static, USB>,
-) -> CdcAcmClass<'static, usb::Driver<'static, USB>> {
+) -> (
+    Endpoint<'static, USB, usb::In>,
+    Endpoint<'static, USB, usb::Out>,
+) {
     let driver = usb::Driver::new(usb, Irqs);
 
     let config = {
@@ -44,10 +51,15 @@ pub async fn init(
         )
     };
 
-    let main_class = {
-        static STATE: StaticCell<cdc_acm::State> = StaticCell::new();
-        CdcAcmClass::new(&mut builder, STATE.init(cdc_acm::State::new()), 64)
-    };
+    let write_ep;
+    let read_ep;
+    {
+        let mut func = builder.function(0xFF, 0, 0);
+        let mut iface = func.interface();
+        let mut alt = iface.alt_setting(0xFF, 0, 0, None);
+        write_ep = alt.endpoint_bulk_in(None, 64);
+        read_ep = alt.endpoint_bulk_out(None, 64);
+    }
 
     let logger_class = {
         static STATE: StaticCell<cdc_acm::State> = StaticCell::new();
@@ -63,7 +75,7 @@ pub async fn init(
         .spawn(usb_logger_task(logger_class))
         .expect("failed to spawn usb_logger_task");
 
-    main_class
+    (write_ep, read_ep)
 }
 
 #[embassy_executor::task]

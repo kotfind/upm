@@ -2,10 +2,10 @@
 
 from os import chdir
 from typing import Callable
-from click import command, echo, style, secho
+from click import echo, style, secho, group
 from threading import Thread
 from pathlib import Path
-from duct import cmd
+from duct import cmd, StatusError
 from serial.tools.list_ports_common import ListPortInfo
 from serial.tools.list_ports import comports
 from serial import Serial, SerialException
@@ -69,7 +69,7 @@ def autoload():
 
         secho(f"{"-" * 50}\n", bold=True, fg="blue")
 
-        out = cmd("cargo", "run", "--color=always", "--release").unchecked().run()
+        out = cmd("cargo", "run", "--release").dir("./upm-device").unchecked().run()
 
         secho(f"\n{"-" * 50}\n", bold=True, fg="blue")
 
@@ -79,7 +79,7 @@ def autoload():
             input()
 
 
-def run():
+def run_device():
     Thread(target=autoload).start()
 
     Thread(
@@ -87,7 +87,7 @@ def run():
         args=[
             style("LOG:", fg="yellow", bold=True),
             lambda p: p.vid == 0xC0DE and p.pid == 0xCAFE,
-            1,
+            0,
         ],
     ).start()
 
@@ -101,12 +101,29 @@ def run():
     ).start()
 
 
+def run_cli():
+    secho("Running cli...", bold=True)
+
+    out = cmd("cargo", "run").dir("./upm-pc-cli").unchecked().run()
+    exit(out.status)
+
+
 # -------------------- Cli --------------------
 
 
-@command()
+@group
 def cli():
-    run()
+    pass
+
+
+@cli.command("device")
+def cli_device():
+    run_device()
+
+
+@cli.command("cli")
+def cli_cli():
+    run_cli()
 
 
 if __name__ == "__main__":

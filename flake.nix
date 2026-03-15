@@ -36,11 +36,13 @@
             cargo
             rustfmt
             clippy
+            rust-src
           ])
           ++ (map (t: targets.${t}.stable.rust-std) [
             "thumbv8m.main-none-eabihf"
             "riscv32imac-unknown-none-elf"
             "thumbv6m-none-eabi"
+            "x86_64-unknown-linux-gnu"
           ])
         );
 

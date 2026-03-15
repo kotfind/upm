@@ -2,7 +2,9 @@
 #![no_main]
 
 use embassy_executor::Spawner;
-use log::info;
+use embassy_time::Timer;
+use embassy_usb_driver::{Endpoint, EndpointIn, EndpointOut};
+use log::{error, info};
 
 mod panic;
 mod usb;
@@ -11,16 +13,31 @@ mod usb;
 async fn main(spawner: Spawner) {
     let p = embassy_rp::init(Default::default());
 
-    let mut usb_class = usb::init(spawner, p.USB).await;
+    let (mut write_ep, mut read_ep) = usb::init(spawner, p.USB).await;
+
+    Timer::after_secs(1).await;
+
+    read_ep.wait_enabled().await;
+    write_ep.wait_enabled().await;
+    info!("Connected");
 
     loop {
-        let mut data = [0u8; 1024];
-        let res = usb_class
-            .read_packet(&mut data)
-            .await
-            .map(|data_len| &data[..data_len])
-            .unwrap();
+        let mut buf = [0u8; 1024];
+        let data = match read_ep.read(&mut buf).await.map(|n| &buf[..n]) {
+            Ok(v) => v,
+            Err(e) => {
+                error!("failed to read: {e:?}");
+                continue;
+            }
+        };
 
-        info!("recv: {res:02x?}");
+        info!("read {} bytes", data.len());
+
+        if let Err(e) = write_ep.write(data).await {
+            error!("failed to write: {e:?}");
+            continue;
+        }
+
+        Timer::after_secs(1).await;
     }
 }
