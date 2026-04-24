@@ -56,7 +56,29 @@ impl<'a> Io<'a> {
         self.rx.wait_enabled().await;
     }
 
-    // pub async fn write_bytes(&mut self, bytes: &[u8]) -> Result<(), Error> {}
+    pub async fn write_bytes(&mut self, bytes: &[u8]) -> Result<(), Error> {
+        let mut bytes_wrote_total = 0;
+
+        loop {
+            let bytes_to_write = (bytes.len() - bytes_wrote_total).min(USB_PACKET_SIZE);
+
+            if bytes_to_write == 0 {
+                self.tx.write(&[]).await?;
+                break;
+            }
+
+            self.tx
+                .write(&bytes[bytes_wrote_total..bytes_wrote_total + bytes_to_write])
+                .await?;
+            bytes_wrote_total += bytes_to_write;
+
+            if bytes_to_write < USB_PACKET_SIZE {
+                break;
+            }
+        }
+
+        Ok(())
+    }
 
     pub async fn read_bytes(&mut self, bytes: &mut [u8]) -> Result<usize, Error> {
         let mut bytes_read_total = 0;

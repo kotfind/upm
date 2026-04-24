@@ -58,5 +58,13 @@ impl Io {
         Ok(())
     }
 
-    // pub async fn read_bytes(&mut self) -> Result<Vec<u8>, Error> {}
+    pub async fn read_bytes(&mut self) -> Result<Vec<u8>, Error> {
+        let mut data = Vec::new();
+
+        let mut reader = self.rx.until_short_packet();
+        reader.read_to_end(&mut data).await?;
+        reader.consume_end().unwrap();
+
+        Ok(data)
+    }
 }

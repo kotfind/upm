@@ -3,8 +3,6 @@
 
 use embassy_executor::Spawner;
 use embassy_time::Timer;
-use embassy_usb_driver::EndpointOut;
-use log::{error, info};
 
 mod io;
 mod panic;
@@ -21,13 +19,7 @@ async fn main(spawner: Spawner) {
     io.init().await;
 
     loop {
-        let mut buf = [0u8; 1024];
-        let data = io
-            .read_bytes(&mut buf)
-            .await
-            .map(|len| &buf[..len])
-            .unwrap();
-
-        info!("read {} bytes", data.len());
+        io.write_bytes(b"hello").await.unwrap();
+        Timer::after_millis(100).await;
     }
 }
