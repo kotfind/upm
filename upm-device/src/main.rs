@@ -3,6 +3,7 @@
 
 use embassy_executor::Spawner;
 use embassy_time::Timer;
+use log::info;
 
 mod io;
 mod panic;
@@ -19,7 +20,19 @@ async fn main(spawner: Spawner) {
     io.init().await;
 
     loop {
-        io.write_bytes(b"hello").await.unwrap();
-        Timer::after_millis(100).await;
+        let mut buf = [0u8; 1024];
+        let data = io
+            .read_bytes(&mut buf)
+            .await
+            .map(|len| &mut buf[..len])
+            .unwrap();
+
+        info!("read {} bytes", data.len());
+
+        for i in 0..data.len() / 2 {
+            data.swap(i, data.len() - i - 1);
+        }
+
+        io.write_bytes(data).await.unwrap();
     }
 }

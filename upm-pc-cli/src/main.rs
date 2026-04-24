@@ -1,7 +1,5 @@
 use std::{error::Error, process, time::Duration};
 
-use tokio::io::AsyncReadExt;
-
 use crate::io::Io;
 
 mod io;
@@ -32,7 +30,8 @@ async fn run() -> Result<(), io::Error> {
     tokio::time::sleep(Duration::from_secs(1)).await;
 
     loop {
-        let bytes = io.read_bytes().await?;
-        println!("read {} bytes", bytes.len());
+        io.write_bytes(b"hello").await?;
+        let resp = io.read_bytes().await?;
+        println!("{}", str::from_utf8(&resp).unwrap());
     }
 }
