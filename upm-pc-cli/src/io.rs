@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use minicbor::{Decode, Encode};
 use nusb::{
     io::{EndpointRead, EndpointWrite},
     transfer::{Bulk, In, Out},
@@ -25,6 +26,12 @@ pub enum Error {
 
     #[error("read timed out")]
     ReadTimeout,
+
+    #[error("cbor encode error")]
+    CborEncode(#[from] minicbor::encode::Error<std::convert::Infallible>),
+
+    #[error("cbor decode error")]
+    CborDecode(#[from] minicbor::decode::Error),
 }
 
 pub struct Io {
@@ -50,6 +57,22 @@ impl Io {
         let rx = iface.endpoint::<Bulk, In>(RX_EP_ADDR)?.reader(RX_BUF_SIZE);
 
         Ok(Self { tx, rx })
+    }
+
+    pub async fn write_cbor<T: Encode<()>>(&mut self, item: &T) -> Result<(), Error> {
+        let mut bytes = Vec::new();
+        minicbor::encode(item, &mut bytes)?;
+
+        self.write_bytes(&bytes).await?;
+
+        Ok(())
+    }
+
+    pub async fn read_cbor<T: for<'b> Decode<'b, ()>>(&mut self) -> Result<T, Error> {
+        let bytes = self.read_bytes().await?;
+        let item = minicbor::decode(&bytes)?;
+
+        Ok(item)
     }
 
     pub async fn write_bytes(&mut self, bytes: &[u8]) -> Result<(), Error> {

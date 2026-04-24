@@ -4,7 +4,9 @@
 use embassy_executor::Spawner;
 use embassy_time::Timer;
 use log::info;
+use upm_common::msg::{MSG_CBOR_MAX_LEN, Msg};
 
+mod gvec;
 mod io;
 mod panic;
 mod usb;
@@ -19,20 +21,30 @@ async fn main(spawner: Spawner) {
 
     io.init().await;
 
-    loop {
-        let mut buf = [0u8; 1024];
-        let data = io
-            .read_bytes(&mut buf)
-            .await
-            .map(|len| &mut buf[..len])
-            .unwrap();
+    let msg = io.read_cbor::<Msg, MSG_CBOR_MAX_LEN>().await.unwrap();
+    info!("{}", msg.text);
 
-        info!("read {} bytes", data.len());
+    io.write_cbor::<_, MSG_CBOR_MAX_LEN>(&Msg {
+        text: "1!".try_into().unwrap(),
+    })
+    .await
+    .unwrap();
 
-        for i in 0..data.len() / 2 {
-            data.swap(i, data.len() - i - 1);
-        }
+    let msg = io.read_cbor::<Msg, MSG_CBOR_MAX_LEN>().await.unwrap();
+    info!("{}", msg.text);
 
-        io.write_bytes(data).await.unwrap();
-    }
+    io.write_cbor::<_, MSG_CBOR_MAX_LEN>(&Msg {
+        text: "2!".try_into().unwrap(),
+    })
+    .await
+    .unwrap();
+
+    let msg = io.read_cbor::<Msg, MSG_CBOR_MAX_LEN>().await.unwrap();
+    info!("{}", msg.text);
+
+    io.write_cbor::<_, MSG_CBOR_MAX_LEN>(&Msg {
+        text: "3!".try_into().unwrap(),
+    })
+    .await
+    .unwrap();
 }

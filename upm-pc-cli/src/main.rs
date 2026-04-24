@@ -1,5 +1,7 @@
 use std::{error::Error, process, time::Duration};
 
+use upm_common::msg::Msg;
+
 use crate::io::Io;
 
 mod io;
@@ -29,9 +31,29 @@ async fn run() -> Result<(), io::Error> {
 
     tokio::time::sleep(Duration::from_secs(1)).await;
 
-    loop {
-        io.write_bytes(b"hello").await?;
-        let resp = io.read_bytes().await?;
-        println!("{}", str::from_utf8(&resp).unwrap());
-    }
+    io.write_cbor(&Msg {
+        text: "A!".try_into().unwrap(),
+    })
+    .await?;
+
+    let msg = io.read_cbor::<Msg>().await?;
+    println!("{}", msg.text);
+
+    io.write_cbor(&Msg {
+        text: "B!".try_into().unwrap(),
+    })
+    .await?;
+
+    let msg = io.read_cbor::<Msg>().await?;
+    println!("{}", msg.text);
+
+    io.write_cbor(&Msg {
+        text: "C!".try_into().unwrap(),
+    })
+    .await?;
+
+    let msg = io.read_cbor::<Msg>().await?;
+    println!("{}", msg.text);
+
+    Ok(())
 }
