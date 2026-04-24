@@ -1,6 +1,6 @@
 use std::{error::Error, process, time::Duration};
 
-use upm_common::msg::Msg;
+use upm_common::{Resp, req::BlinkReq, resp::BlinkEndedResp};
 
 use crate::io::Io;
 
@@ -31,29 +31,13 @@ async fn run() -> Result<(), io::Error> {
 
     tokio::time::sleep(Duration::from_secs(1)).await;
 
-    io.write_cbor(&Msg {
-        text: "A!".try_into().unwrap(),
-    })
-    .await?;
+    io.send(BlinkReq { n: 3 }).await?;
 
-    let msg = io.read_cbor::<Msg>().await?;
-    println!("{}", msg.text);
-
-    io.write_cbor(&Msg {
-        text: "B!".try_into().unwrap(),
-    })
-    .await?;
-
-    let msg = io.read_cbor::<Msg>().await?;
-    println!("{}", msg.text);
-
-    io.write_cbor(&Msg {
-        text: "C!".try_into().unwrap(),
-    })
-    .await?;
-
-    let msg = io.read_cbor::<Msg>().await?;
-    println!("{}", msg.text);
+    match io.listen().await? {
+        Resp::BlinkEnded(BlinkEndedResp { n }) => {
+            println!("blinked {n} times");
+        }
+    }
 
     Ok(())
 }

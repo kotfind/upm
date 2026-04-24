@@ -2,9 +2,10 @@
 #![no_main]
 
 use embassy_executor::Spawner;
+use embassy_rp::gpio::{Level, Output};
 use embassy_time::Timer;
 use log::info;
-use upm_common::msg::{MSG_CBOR_MAX_LEN, Msg};
+use upm_common::{Req::Blink, req::BlinkReq, resp::BlinkEndedResp};
 
 mod gvec;
 mod io;
@@ -21,30 +22,16 @@ async fn main(spawner: Spawner) {
 
     io.init().await;
 
-    let msg = io.read_cbor::<Msg, MSG_CBOR_MAX_LEN>().await.unwrap();
-    info!("{}", msg.text);
+    let mut led = Output::new(p.PIN_25, Level::Low);
 
-    io.write_cbor::<_, MSG_CBOR_MAX_LEN>(&Msg {
-        text: "1!".try_into().unwrap(),
-    })
-    .await
-    .unwrap();
-
-    let msg = io.read_cbor::<Msg, MSG_CBOR_MAX_LEN>().await.unwrap();
-    info!("{}", msg.text);
-
-    io.write_cbor::<_, MSG_CBOR_MAX_LEN>(&Msg {
-        text: "2!".try_into().unwrap(),
-    })
-    .await
-    .unwrap();
-
-    let msg = io.read_cbor::<Msg, MSG_CBOR_MAX_LEN>().await.unwrap();
-    info!("{}", msg.text);
-
-    io.write_cbor::<_, MSG_CBOR_MAX_LEN>(&Msg {
-        text: "3!".try_into().unwrap(),
-    })
-    .await
-    .unwrap();
+    match io.listen().await.unwrap() {
+        Blink(BlinkReq { n }) => {
+            info!("going to blink {n} times");
+            for _ in 0..2 * n {
+                led.toggle();
+                Timer::after_millis(300).await;
+            }
+            io.send(BlinkEndedResp { n }).await.unwrap();
+        }
+    }
 }

@@ -1,5 +1,3 @@
-use core::error;
-
 use embassy_rp::{
     peripherals::USB,
     usb::{Endpoint, In, Out},
@@ -7,10 +5,11 @@ use embassy_rp::{
 use embassy_time::Duration;
 use embassy_usb_driver::{Endpoint as _, EndpointError, EndpointIn, EndpointOut};
 use generic_array::{ArrayLength, GenericArray};
-use log::info;
-use minicbor::{Decode, Encode, encode::Write};
+use minicbor::{Decode, Encode};
 use thiserror::Error;
-use upm_common::info::USB_PACKET_SIZE;
+use upm_common::{
+    Req, Resp, info::USB_PACKET_SIZE, req::REQ_CBOR_MAX_LEN, resp::RESP_CBOR_MAX_LEN,
+};
 
 use crate::gvec::{self, GVec};
 
@@ -44,9 +43,8 @@ impl From<EndpointError> for Error {
 }
 
 pub struct Io<'a> {
-    // fixme pub
-    pub tx: Endpoint<'a, USB, In>,
-    pub rx: Endpoint<'a, USB, Out>,
+    tx: Endpoint<'a, USB, In>,
+    rx: Endpoint<'a, USB, Out>,
 }
 
 impl<'a> Io<'a> {
@@ -66,6 +64,17 @@ impl<'a> Io<'a> {
     pub async fn init(&mut self) {
         self.tx.wait_enabled().await;
         self.rx.wait_enabled().await;
+    }
+
+    pub async fn send(&mut self, msg: impl Into<Resp>) -> Result<(), Error> {
+        self.write_cbor::<Resp, RESP_CBOR_MAX_LEN>(&msg.into())
+            .await?;
+        Ok(())
+    }
+
+    pub async fn listen(&mut self) -> Result<Req, Error> {
+        let req = self.read_cbor::<Req, REQ_CBOR_MAX_LEN>().await?;
+        Ok(req)
     }
 
     #[allow(non_camel_case_types)] // typenum types
@@ -88,7 +97,7 @@ impl<'a> Io<'a> {
         let mut bytes = GenericArray::<u8, CBOR_MAX_LEN>::default();
         let data = self.read_bytes(&mut bytes).await.map(|len| &bytes[..len])?;
 
-        let item = minicbor::decode(&bytes)?;
+        let item = minicbor::decode(data)?;
 
         Ok(item)
     }

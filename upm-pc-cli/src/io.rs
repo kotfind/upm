@@ -7,6 +7,7 @@ use nusb::{
 };
 use thiserror::Error;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use upm_common::{Req, Resp};
 
 const TX_EP_ADDR: u8 = 0x01;
 const RX_EP_ADDR: u8 = 0x81;
@@ -35,9 +36,8 @@ pub enum Error {
 }
 
 pub struct Io {
-    // FIXME: pub
-    pub tx: EndpointWrite<Bulk>,
-    pub rx: EndpointRead<Bulk>,
+    tx: EndpointWrite<Bulk>,
+    rx: EndpointRead<Bulk>,
 }
 
 impl Io {
@@ -57,6 +57,16 @@ impl Io {
         let rx = iface.endpoint::<Bulk, In>(RX_EP_ADDR)?.reader(RX_BUF_SIZE);
 
         Ok(Self { tx, rx })
+    }
+
+    pub async fn send(&mut self, msg: impl Into<Req>) -> Result<(), Error> {
+        self.write_cbor(&msg.into()).await?;
+        Ok(())
+    }
+
+    pub async fn listen(&mut self) -> Result<Resp, Error> {
+        let req = self.read_cbor().await?;
+        Ok(req)
     }
 
     pub async fn write_cbor<T: Encode<()>>(&mut self, item: &T) -> Result<(), Error> {

@@ -1,4 +1,8 @@
 #![no_std]
 
+pub use req::Req;
+pub use resp::Resp;
+
 pub mod info;
-pub mod msg;
+pub mod req;
+pub mod resp;
