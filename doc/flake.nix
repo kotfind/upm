@@ -2,11 +2,16 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    duct-py-src = {
+      url = "github:oconnor663/duct.py";
+      flake = false;
+    };
   };
 
   outputs = {
     nixpkgs,
     flake-utils,
+    duct-py-src,
     ...
   }:
     flake-utils.lib.eachDefaultSystem (system: let
@@ -19,7 +24,27 @@
       lib = pkgs.lib;
 
       inherit (pkgs) mkShell;
-      inherit (lib.strings) concatMapStringsSep;
+      inherit (lib) concatMapStringsSep;
+
+      ductPy = pypkgs:
+        with pypkgs;
+          buildPythonPackage {
+            pname = "duct";
+            version = "1.0.1";
+
+            src = duct-py-src;
+            pyproject = true;
+
+            buildInputs = with pypkgs; [
+              hatchling
+            ];
+          };
+
+      python = pkgs.python3.withPackages (pypkgs:
+        [(ductPy pypkgs)]
+        ++ (with pypkgs; [
+          click
+        ]));
 
       fonts = with pkgs; [
         corefonts
@@ -27,14 +52,14 @@
       ];
 
       shell = mkShell {
-        name = "usb-password-manager-doc-shell";
+        name = "upm-doc-shell";
 
-        buildInputs = with pkgs;
-          [
+        buildInputs =
+          [python]
+          ++ fonts
+          ++ (with pkgs; [
             typst
-            zathura
-          ]
-          ++ fonts;
+          ]);
 
         TYPST_FONT_PATHS =
           concatMapStringsSep

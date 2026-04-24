@@ -1,4 +1,4 @@
-#let template(cfg: none, body) = {
+#let template(cfg: none, doc_name: none, body) = {
     assert(cfg != none)
     assert(cfg.project != none)
     assert(cfg.project.code != none)
@@ -15,6 +15,8 @@
     assert(cfg.edu_program_name != none)
     assert(cfg.city != none)
     assert(cfg.year != none)
+    assert(doc_name != none)
+    assert(body != none)
 
     let un(n) = "_" * n
 
@@ -34,9 +36,13 @@
                     columns: (25mm, 35mm, 25mm, 25mm, 35mm),
                     rows: (5mm, 7mm),
                     align: center,
-                    [Инв.№ подп], [Подп. и дата], [Взам. инв.№], [Инв.№ дубл.], [Подп. и дата]
-                )
-            )
+                    [Инв.№ подп],
+                    [Подп. и дата],
+                    [Взам. инв.№],
+                    [Инв.№ дубл.],
+                    [Подп. и дата],
+                ),
+            ),
         )
     }
 
@@ -80,7 +86,7 @@
                 #un(13) #cfg.approved_by.name
 
                 "#un(3)" #un(13) #cfg.year г.
-            ]
+            ],
         )
 
         let center_banner = [
@@ -89,7 +95,7 @@
 
             #par(spacing: 0.65em, cfg.project.name)
 
-            Техническое задание
+            #doc_name
 
             ЛИСТ УТВЕРЖДЕНИЯ
 
@@ -123,12 +129,12 @@
                 top: 20mm,
                 bottom: 10mm,
             ),
-            foreground: storage_table
+            foreground: storage_table,
         )[
             #set align(center)
 
             #grid(
-                columns: (1fr),
+                columns: 1fr,
                 row-gutter: 1fr,
                 top_banner,
                 approve_table,
@@ -157,11 +163,11 @@
 
             #par(spacing: 0.65em, cfg.project.name)
 
-            Техническое задание
+            #doc_name
 
             #cfg.project.code
 
-            Листов #context {counter(page).final().at(0) - 1}
+            Листов #context { counter(page).final().at(0) - 1 }
         ]
 
         let bottom_banner = [
@@ -179,12 +185,12 @@
                 top: 20mm,
                 bottom: 10mm,
             ),
-            foreground: storage_table
+            foreground: storage_table,
         )[
             #set align(center)
 
             #grid(
-                columns: (1fr),
+                columns: 1fr,
                 row-gutter: 1fr,
                 top_banner,
                 center_banner,
@@ -232,12 +238,16 @@
                     align: center,
                     rows: 7mm,
 
-                    [],           [],             [],             [],             [],
-                    [Изм.],           [Лист],         [№ докум.],     [Подп.],        [Дата],
-                    cfg.project.code, [],             [],             [],             [],
-                    [Инв. № подл.],   [Подп. и дата], [Взам. Инв. №], [Инв. № дубл.], [Подп. и дата],
+                    [], [], [], [], [],
+                    [Изм.], [Лист], [№ докум.], [Подп.], [Дата],
+                    cfg.project.code, [], [], [], [],
+                    [Инв. № подл.],
+                    [Подп. и дата],
+                    [Взам. Инв. №],
+                    [Инв. № дубл.],
+                    [Подп. и дата],
                 )
-            ]
+            ],
         )
 
         set par(
@@ -275,7 +285,7 @@
     set text(
         lang: "ru",
         size: 12pt,
-        font: "Times New Roman"
+        font: "Times New Roman",
     )
 
     approval_page
