@@ -30,8 +30,8 @@ async fn run() -> Result<(), io::Error> {
     tokio::time::sleep(Duration::from_secs(1)).await;
 
     loop {
-        io.write_bytes(b"Hello, world!").await?;
-        let ans = io.read_bytes().await?;
-        println!("-- {}", str::from_utf8(&ans).unwrap());
+        io.write_bytes(b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+            .await?;
+        tokio::time::sleep(Duration::from_millis(100)).await;
     }
 }

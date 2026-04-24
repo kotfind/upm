@@ -1,11 +1,7 @@
 use core::fmt::Write;
 
 use embassy_executor::Spawner;
-use embassy_rp::{
-    Peri, bind_interrupts,
-    peripherals::USB,
-    usb::{self, Endpoint},
-};
+use embassy_rp::{Peri, bind_interrupts, peripherals::USB, usb};
 use embassy_time::Instant;
 use embassy_usb::{
     UsbDevice,
@@ -15,17 +11,13 @@ use embassy_usb_logger::Writer;
 use log::{Level, LevelFilter, Record};
 use static_cell::StaticCell;
 
+use crate::io::Io;
+
 bind_interrupts!(struct Irqs {
     USBCTRL_IRQ => usb::InterruptHandler<USB>;
 });
 
-pub async fn init(
-    spawner: Spawner,
-    usb: Peri<'static, USB>,
-) -> (
-    Endpoint<'static, USB, usb::In>,
-    Endpoint<'static, USB, usb::Out>,
-) {
+pub async fn init(spawner: Spawner, usb: Peri<'static, USB>) -> Io<'static> {
     let driver = usb::Driver::new(usb, Irqs);
 
     let config = {
@@ -53,15 +45,7 @@ pub async fn init(
         )
     };
 
-    let write_ep;
-    let read_ep;
-    {
-        let mut func = builder.function(0xFF, 0, 0);
-        let mut iface = func.interface();
-        let mut alt = iface.alt_setting(0xFF, 0, 0, None);
-        write_ep = alt.endpoint_bulk_in(None, 64);
-        read_ep = alt.endpoint_bulk_out(None, 64);
-    }
+    let io = Io::new(&mut builder);
 
     let logger_class = {
         static STATE: StaticCell<cdc_acm::State> = StaticCell::new();
@@ -77,7 +61,7 @@ pub async fn init(
         .spawn(usb_logger_task(logger_class))
         .expect("failed to spawn usb_logger_task");
 
-    (write_ep, read_ep)
+    io
 }
 
 #[embassy_executor::task]

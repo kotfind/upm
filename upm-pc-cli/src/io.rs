@@ -13,7 +13,7 @@ const RX_EP_ADDR: u8 = 0x81;
 const TX_BUF_SIZE: usize = 4096;
 const RX_BUF_SIZE: usize = 4096;
 
-const READ_TIMEOUT: Duration = Duration::from_millis(200);
+const READ_TIMEOUT: Duration = Duration::from_millis(5000);
 
 #[derive(Error, Debug)]
 pub enum Error {
@@ -28,8 +28,9 @@ pub enum Error {
 }
 
 pub struct Io {
-    tx: EndpointWrite<Bulk>,
-    rx: EndpointRead<Bulk>,
+    // FIXME: pub
+    pub tx: EndpointWrite<Bulk>,
+    pub rx: EndpointRead<Bulk>,
 }
 
 impl Io {
@@ -52,29 +53,10 @@ impl Io {
     }
 
     pub async fn write_bytes(&mut self, bytes: &[u8]) -> Result<(), Error> {
-        let bytes_len = bytes.len() as u64;
-        self.tx.write_all(&bytes_len.to_be_bytes()).await?;
         self.tx.write_all(bytes).await?;
-        self.tx.flush().await?;
+        self.tx.flush_end_async().await?;
         Ok(())
     }
 
-    pub async fn read_bytes(&mut self) -> Result<Vec<u8>, Error> {
-        let msg_len: usize;
-        {
-            let mut len_buf = [0u8; size_of::<u64>()];
-            self.rx.read_exact(&mut len_buf).await?;
-
-            msg_len = u64::from_be_bytes(len_buf) as usize;
-        }
-
-        let mut bytes = vec![0u8; msg_len];
-        tokio::time::timeout(READ_TIMEOUT, async {
-            self.rx.read_exact(bytes.as_mut_slice()).await
-        })
-        .await
-        .map_err(|_| Error::ReadTimeout)??;
-
-        Ok(bytes)
-    }
+    // pub async fn read_bytes(&mut self) -> Result<Vec<u8>, Error> {}
 }
