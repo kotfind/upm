@@ -5,7 +5,7 @@ from typing import Callable
 from click import echo, style, secho, group
 from threading import Thread
 from pathlib import Path
-from duct import cmd, StatusError
+from duct import cmd
 from serial.tools.list_ports_common import ListPortInfo
 from serial.tools.list_ports import comports
 from serial import Serial, SerialException
@@ -86,7 +86,7 @@ def run_device():
         target=loop_serial,
         args=[
             style("LOG:", fg="yellow", bold=True),
-            lambda p: p.vid == 0xC0DE and p.pid == 0xCAFE,
+            lambda p: p.vid == 0xABCD and p.pid == 0x1234,
             0,
         ],
     ).start()
@@ -111,21 +111,21 @@ def run_cli():
 # -------------------- Cli --------------------
 
 
-@group
-def cli():
+@group(context_settings=dict(help_option_names=["-h", "--help"]))
+def x():
     pass
 
 
-@cli.command("device")
-def cli_device():
+@x.command("device")
+def x_device():
     run_device()
 
 
-@cli.command("cli")
-def cli_cli():
+@x.command("cli")
+def x_cli():
     run_cli()
 
 
 if __name__ == "__main__":
     chdir(Path(__file__).parent)
-    cli()
+    x()

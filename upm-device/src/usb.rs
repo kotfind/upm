@@ -29,10 +29,12 @@ pub async fn init(
     let driver = usb::Driver::new(usb, Irqs);
 
     let config = {
-        let mut c = embassy_usb::Config::new(0xC0DE, 0xCAFE);
-        c.manufacturer = Some("Kotfind");
-        c.product = Some("Pico");
-        c.serial_number = Some("123456789");
+        use upm_common::info::*;
+
+        let mut c = embassy_usb::Config::new(VENDOR_ID, PRODUCT_ID);
+        c.manufacturer = Some(MANUFACTURER_NAME);
+        c.product = Some(PRODUCT_NAME);
+        c.serial_number = None;
         c
     };
 

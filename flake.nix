@@ -7,11 +7,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     duct-py-src = {
-      url = "https://files.pythonhosted.org/packages/source/d/duct/duct-1.0.1.tar.gz";
+      url = "github:oconnor663/duct.py";
       flake = false;
     };
     cbor-diag-cli-src = {
-      url = "http://crates.io/api/v1/crates/cbor-diag-cli/0.1.8/download";
+      url = "github:Nullus157/cbor-diag-rs";
       flake = false;
     };
   };
@@ -27,7 +27,7 @@
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
 
-      inherit (pkgs) mkShell;
+      inherit (pkgs) mkShell makeRustPlatform;
 
       rustToolchain = with fenix.packages.${system};
         combine (
@@ -37,6 +37,7 @@
             rustfmt
             clippy
             rust-src
+            rust-analyzer
           ])
           ++ (map (t: targets.${t}.stable.rust-std) [
             "thumbv8m.main-none-eabihf"
@@ -60,14 +61,18 @@
             ];
           };
 
-      cborDiagCli = pkgs.rustPlatform.buildRustPackage (finalAttrs: {
+      rustPlatform = makeRustPlatform {
+        cargo = rustToolchain;
+        rustc = rustToolchain;
+      };
+
+      cborDiagCli = rustPlatform.buildRustPackage (finalAttrs: {
         pname = "cbor-diag-cli";
         version = "0.1.8";
 
         src = cbor-diag-cli-src;
-        unpackCmd = "tar xf $src";
 
-        cargoHash = "sha256-jHy7D7xlKoQLKvLxqL8pzjvUx1fUvLxz0tx0QLStJUY=";
+        cargoHash = "sha256-Paf53r3i8rXvlEDk8m10NsdsW5axJlHhTMEms6SUPLc=";
       });
 
       python = pkgs.python3.withPackages (
@@ -80,7 +85,7 @@
       );
 
       shell = mkShell {
-        name = "usb-password-manager-shell";
+        name = "upm-shell";
 
         buildInputs =
           [
@@ -89,8 +94,6 @@
             cborDiagCli
           ]
           ++ (with pkgs; [
-            rust-analyzer
-
             cargo-machete
             cargo-autoinherit
             cargo-expand

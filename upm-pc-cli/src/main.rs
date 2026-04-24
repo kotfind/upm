@@ -29,7 +29,10 @@ async fn main() {
 async fn run() -> Result<(), nusb::Error> {
     let di = nusb::list_devices()
         .await?
-        .find(|d| d.vendor_id() == 0xC0DE && d.product_id() == 0xCAFE)
+        .find(|d| {
+            use upm_common::info::*;
+            d.vendor_id() == VENDOR_ID && d.product_id() == PRODUCT_ID
+        })
         .expect("no device found");
 
     let device = di.open().await?;
