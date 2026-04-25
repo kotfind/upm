@@ -2,6 +2,7 @@ use std::process;
 
 use crate::util::print_error;
 
+mod cmd;
 mod io;
 mod run;
 mod util;

@@ -2,7 +2,7 @@ use core::fmt::Write;
 
 use embassy_executor::Spawner;
 use embassy_rp::{Peri, bind_interrupts, peripherals::USB, usb};
-use embassy_time::Instant;
+use embassy_time::{Instant, Timer};
 use embassy_usb::{
     UsbDevice,
     class::cdc_acm::{self, CdcAcmClass},
@@ -45,7 +45,7 @@ pub async fn init(spawner: Spawner, usb: Peri<'static, USB>) -> Io<'static> {
         )
     };
 
-    let io = Io::new(&mut builder);
+    let mut io = Io::new(&mut builder);
 
     let logger_class = {
         static STATE: StaticCell<cdc_acm::State> = StaticCell::new();
@@ -60,6 +60,9 @@ pub async fn init(spawner: Spawner, usb: Peri<'static, USB>) -> Io<'static> {
     spawner
         .spawn(usb_logger_task(logger_class))
         .expect("failed to spawn usb_logger_task");
+
+    Timer::after_secs(1).await;
+    io.init().await;
 
     io
 }

@@ -11,7 +11,7 @@ use upm_common::{
     Req, Resp, info::USB_PACKET_SIZE, req::REQ_CBOR_MAX_LEN, resp::RESP_CBOR_MAX_LEN,
 };
 
-use crate::gvec::{self, GVec};
+use crate::util::gvec::{self, GVec};
 
 const READ_TIMEOUT: Duration = Duration::from_millis(200);
 

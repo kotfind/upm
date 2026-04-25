@@ -1,10 +1,10 @@
-use clap::{Parser, Subcommand};
-use console::style;
-use dialoguer::{Input, theme::ColorfulTheme};
+use clap::Parser;
 use thiserror::Error;
-use upm_common::{Resp, req::BlinkReq, resp::BlinkEndedResp};
 
-use crate::io::{self, Io};
+use crate::{
+    cmd::{self, Cmd, CmdContext},
+    io::{self, Io},
+};
 
 #[derive(Error, Debug)]
 pub enum Error {
@@ -28,37 +28,13 @@ struct Args {
     cmd: Cmd,
 }
 
-#[derive(Subcommand, Clone)]
-enum Cmd {
-    Blink,
-}
-
 pub async fn run() -> Result<(), Error> {
     let args = Args::try_parse()?;
 
-    let mut io = Io::new().await?;
+    let io = Io::new().await?;
+    let mut ctx = CmdContext { io };
 
-    match args.cmd {
-        Cmd::Blink => {
-            let n: usize = Input::with_theme(&ColorfulTheme::default())
-                .with_prompt("How many times to blink?")
-                .validate_with(|n_str: &String| -> Result<(), &str> {
-                    n_str
-                        .parse::<usize>()
-                        .map(|_| ())
-                        .map_err(|_| "Value should be a number")
-                })
-                .interact_text()?
-                .parse()
-                .unwrap();
-
-            io.send(BlinkReq { n }).await?;
-            let Resp::BlinkEnded(BlinkEndedResp { n }) = io.listen().await? else {
-                return Err(Error::UnexpectedResponse);
-            };
-            println!("{}", style(format!("Device blinked {n} times.")).green());
-        }
-    }
+    cmd::send(&mut ctx, args.cmd).await;
 
     Ok(())
 }
