@@ -2,9 +2,10 @@
 
 from os import chdir
 from typing import Callable
-from click import echo, style, secho, group
+from click import argument, echo, style, secho, group
 from threading import Thread
 from pathlib import Path
+import click
 from duct import cmd
 from serial.tools.list_ports_common import ListPortInfo
 from serial.tools.list_ports import comports
@@ -86,7 +87,7 @@ def run_device():
         target=loop_serial,
         args=[
             style("LOG:", fg="yellow", bold=True),
-            lambda p: p.vid == 0xABCD and p.pid == 0x1234,
+            lambda p: p.vid == 0xC0DE and p.pid == 0xCAFE,
             0,
         ],
     ).start()
@@ -101,10 +102,10 @@ def run_device():
     ).start()
 
 
-def run_cli():
+def run_cli(args: list[str]):
     secho("Running cli...", bold=True)
 
-    out = cmd("cargo", "run").dir("./upm-cli").unchecked().run()
+    out = cmd("cargo", "run", "--", *args).dir("./upm-cli").unchecked().run()
     exit(out.status)
 
 
@@ -122,8 +123,10 @@ def x_device():
 
 
 @x.command("cli")
-def x_cli():
-    run_cli()
+@argument("args", nargs=-1, type=click.UNPROCESSED)
+def x_cli(args):
+    args = [str(arg) for arg in args]
+    run_cli(args)
 
 
 if __name__ == "__main__":
