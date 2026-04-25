@@ -104,7 +104,7 @@ def run_device():
 def run_cli():
     secho("Running cli...", bold=True)
 
-    out = cmd("cargo", "run").dir("./upm-pc-cli").unchecked().run()
+    out = cmd("cargo", "run").dir("./upm-cli").unchecked().run()
     exit(out.status)
 
 
