@@ -1,0 +1,11 @@
+my-ToR:
+  type: article
+  title: '"USB Менеджер Паролей". Техническое задание'
+  author: 'Чубий С.А.'
+  date: 2026
+
+my-manual:
+  type: article
+  title: '"USB Менеджер Паролей". Руководство пользователя'
+  author: 'Чубий С.А.'
+  date: 2026
