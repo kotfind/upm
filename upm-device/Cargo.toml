@@ -41,7 +41,7 @@ portable-atomic = { version = "1.13.1", features = ["critical-section"] }
 rekv = { path = "../../../pet/rekv" }
 static_cell = "2.1.1"
 thiserror = { version = "2.0.18", default-features = false }
-typenum = "1.20.0"
+typenum = { version = "1.20.0" }
 upm-common.path = "../upm-common"
 # w25 = { git = "https://github.com/kotfind/w25", features = ["ekv", "log"] }
 w25 = { path = "../../../pet/w25", features = ["ekv", "log"] }

@@ -53,40 +53,7 @@ async fn main(spawner: Spawner) {
     )
     .await;
 
-    // let mut wtx = db.wtx().await.unwrap();
-    //
-    // let smth = PlainRecord {
-    //     id: wtx.new_id().unwrap(),
-    //     name: "Hello".try_into().unwrap(),
-    //     data: b"Some data".iter().cloned().collect(),
-    // };
-    //
-    // wtx.write(&smth).await.unwrap();
-    // wtx.commit().await.unwrap();
-
     let mut ctx = QueryContext { db, io };
 
     query::listen(&mut ctx).await;
 }
-
-// #[derive(Encode, Decode)]
-// pub struct Smth {
-//     #[n(0)]
-//     pub id: Id<Smth>,
-//
-//     #[n(1)]
-//     #[cbor(with = "minicbor_adapters")]
-//     pub name: String<64>,
-// }
-//
-// impl Entity for Smth {
-//     type CBOR_MAX_LEN = typenum::U128;
-//
-//     const RAW_TABLE_ID: u8 = 1;
-//
-//     const DEBUG_NAME: &str = name_of!(type Smth);
-//
-//     fn id(&self) -> Id<Self> {
-//         self.id
-//     }
-// }

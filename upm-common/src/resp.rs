@@ -14,9 +14,6 @@ pub enum Resp {
     #[n(0)]
     Error(#[n(0)] ErrorResp),
 
-    #[n(1)]
-    BlinkEnded(#[n(0)] BlinkEndedResp),
-
     #[n(2)]
     WrotePlain(#[n(0)] WrotePlainResp),
 }
@@ -26,12 +23,6 @@ pub struct ErrorResp {
     #[n(0)]
     #[cbor(with = "minicbor_adapters")]
     pub text: String<1024>,
-}
-
-#[derive(Encode, Decode)]
-pub struct BlinkEndedResp {
-    #[n(0)]
-    pub n: usize,
 }
 
 #[derive(Encode, Decode)]

@@ -10,7 +10,6 @@ pub async fn process<'a, F: Flash, M: RawMutex>(
     ctx: &mut QueryContext<'a, F, M>,
     req: WritePlainReq,
 ) {
-    info!("ABC");
     let mut wtx = ctx.db.wtx().await.unwrap();
 
     let record = PlainRecord {
@@ -19,12 +18,8 @@ pub async fn process<'a, F: Flash, M: RawMutex>(
         data: req.data,
     };
 
-    info!("{}", record.id.to_inner());
-
     Timer::after_millis(100).await;
     wtx.write(&record).await.unwrap();
-
-    info!("alsdkjf");
 
     let _ = embassy_time::with_timeout(Duration::from_secs(1), async {
         wtx.commit().await.unwrap();

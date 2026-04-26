@@ -22,8 +22,6 @@ pub(super) async fn process(ctx: &mut CmdContext) {
         .await
         .unwrap();
 
-    println!("HERE");
-
     match ctx.io.listen().await.unwrap() {
         Resp::WrotePlain(WrotePlainResp { id }) => {
             println!("Device wrote record with id={}", id);

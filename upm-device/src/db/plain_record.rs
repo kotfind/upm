@@ -14,11 +14,11 @@ pub struct PlainRecord {
 
     #[n(2)]
     #[cbor(with = "minicbor_adapters")]
-    pub data: Vec<u8, 16384>, // 16 Kb
+    pub data: Vec<u8, 1024>, // 1 Kb
 }
 
 impl Entity for PlainRecord {
-    type CBOR_MAX_LEN = typenum::U32768; // 32 Kb
+    type CBOR_MAX_LEN = typenum::U2048; // 2 Kb
 
     const RAW_TABLE_ID: u8 = 1;
 
