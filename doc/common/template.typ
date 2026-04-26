@@ -1,4 +1,4 @@
-#let template(cfg: none, doc_name: none, body) = {
+#let template(cfg: none, doc_name: none, doc_code: none, body) = {
     assert(cfg != none)
     assert(cfg.project != none)
     assert(cfg.project.code != none)
@@ -16,11 +16,14 @@
     assert(cfg.city != none)
     assert(cfg.year != none)
     assert(doc_name != none)
+    assert(doc_code != none)
     assert(body != none)
 
     let un(n) = "_" * n
 
-    let approval_page_code = cfg.project.code + "-ЛУ"
+    let project_code = cfg.project.code.replace("{}", doc_code)
+
+    let approval_page_code = project_code + "-ЛУ"
 
     // отметка об учёте и хранении по ГОСТ 19.601-78
     let storage_table = {
@@ -165,7 +168,7 @@
 
             #doc_name
 
-            #cfg.project.code
+            #project_code
 
             Листов #context { counter(page).final().at(0) - 1 }
         ]
@@ -230,7 +233,7 @@
 
                 #context counter(page).display()
 
-                #cfg.project.code
+                #project_code
             ],
             footer: [
                 #table(
@@ -240,7 +243,7 @@
 
                     [], [], [], [], [],
                     [Изм.], [Лист], [№ докум.], [Подп.], [Дата],
-                    cfg.project.code, [], [], [], [],
+                    project_code, [], [], [], [],
                     [Инв. № подл.],
                     [Подп. и дата],
                     [Взам. Инв. №],

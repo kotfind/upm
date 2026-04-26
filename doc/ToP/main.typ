@@ -1,7 +1,12 @@
 #import "../common/template.typ": template
 #import "../common/cfg.typ": cfg
 
-#show: body => template(cfg: cfg, doc_name: "Текст программы", body)
+#show: body => template(
+    cfg: cfg,
+    doc_name: "Текст программы",
+    doc_code: "12",
+    body,
+)
 
 #let href(url) = box(underline(link(url)))
 
