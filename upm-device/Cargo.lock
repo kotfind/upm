@@ -1323,6 +1323,7 @@ checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
 [[package]]
 name = "rekv"
 version = "0.1.0"
+source = "git+https://github.com/kotfind/rekv#aa236d41925164bce9e3b290eee99640ff08c0cc"
 dependencies = [
  "ekv",
  "embassy-sync",
@@ -1788,6 +1789,7 @@ dependencies = [
 [[package]]
 name = "w25"
 version = "0.1.0"
+source = "git+https://github.com/kotfind/w25#5dbf435c1de8b581b1f8e107984203868af81b5b"
 dependencies = [
  "bitflags",
  "ekv",
