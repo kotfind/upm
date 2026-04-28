@@ -1,5 +1,5 @@
 use dialoguer::{Input, theme::ColorfulTheme};
-use upm_common::{Resp, req::WritePlainReq, resp::WrotePlainResp};
+use upm_common::{Resp, resp::WroteKeyResp};
 
 use crate::cmd::CmdContext;
 
@@ -15,7 +15,7 @@ pub(super) async fn process(ctx: &mut CmdContext) {
         .unwrap();
 
     ctx.io
-        .send(WritePlainReq {
+        .send(WriteKeyReq {
             name,
             data: data.bytes().collect(),
         })
@@ -23,7 +23,7 @@ pub(super) async fn process(ctx: &mut CmdContext) {
         .unwrap();
 
     match ctx.io.listen().await.unwrap() {
-        Resp::WrotePlain(WrotePlainResp { id }) => {
+        Resp::WroteKey(WroteKeyResp { id }) => {
             println!("Device wrote record with id={}", id);
         }
         Resp::Error(_) => todo!(),

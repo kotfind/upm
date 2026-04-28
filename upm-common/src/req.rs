@@ -1,27 +1,36 @@
 use derive_more::From;
-use heapless::{String, Vec};
+use heapless::String;
 use minicbor::{Decode, Encode};
+
+use crate::model::KeyKind;
 
 // would be nice to use something like this instead:
 //     https://github.com/twittner/minicbor/pull/56/
 #[allow(non_camel_case_types)]
-pub type REQ_CBOR_MAX_LEN = typenum::U1024;
+pub type REQ_CBOR_MAX_LEN = typenum::U2048;
 
 /// A request is a message from a PC to a device.
 #[derive(Encode, Decode, From)]
 #[allow(clippy::large_enum_variant)]
 pub enum Req {
     #[n(1)]
-    WritePlain(#[n(0)] WritePlainReq),
+    WriteKey(#[n(0)] WriteKeyReq),
 }
 
 #[derive(Encode, Decode)]
-pub struct WritePlainReq {
+pub struct WriteKeyReq {
     #[n(0)]
     #[cbor(with = "minicbor_adapters")]
     pub name: String<64>,
 
     #[n(1)]
     #[cbor(with = "minicbor_adapters")]
-    pub data: Vec<u8, 1024>, // 1 Kb
+    pub passwd_hint: String<64>,
+
+    #[n(2)]
+    #[cbor(with = "minicbor_adapters")]
+    pub passwd: String<64>,
+
+    #[n(3)]
+    pub kind: KeyKind, // 1 Kb
 }

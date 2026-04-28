@@ -2,21 +2,18 @@ use ekv::flash::Flash;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use embassy_time::{Duration, Timer};
 use log::info;
-use upm_common::{req::WritePlainReq, resp::WrotePlainResp};
+use rand::CryptoRng;
+use upm_common::{req::WriteKeyReq, resp::WroteKeyResp};
 
 use crate::{db::KeyRecord, query::QueryContext};
 
-pub async fn process<'a, F: Flash, M: RawMutex>(
-    ctx: &mut QueryContext<'a, F, M>,
-    req: WritePlainReq,
+pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
+    ctx: &mut QueryContext<'a, F, M, R>,
+    req: WriteKeyReq,
 ) {
     let mut wtx = ctx.db.wtx().await.unwrap();
 
-    let record = KeyRecord {
-        id: wtx.new_id().unwrap(),
-        name: req.name,
-        data: req.data,
-    };
+    let record = KeyRecord::from_req(req, wtx.new_id().unwrap(), ctx.rng);
 
     Timer::after_millis(100).await;
     wtx.write(&record).await.unwrap();
@@ -28,7 +25,7 @@ pub async fn process<'a, F: Flash, M: RawMutex>(
 
     info!("wrote a record with id={}", record.id.to_inner());
     ctx.io
-        .send(WrotePlainResp {
+        .send(WroteKeyResp {
             id: record.id.to_inner(),
         })
         .await

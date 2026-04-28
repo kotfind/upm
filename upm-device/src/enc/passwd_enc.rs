@@ -46,11 +46,11 @@ where
     data: GVec<u8, CBOR_MAX_LEN>,
 
     #[n(1)]
-    #[cbor(with = "crate::util::garr_cbor")]
+    #[cbor(with = "::upm_common::util::garr_cbor")]
     auth_tag: Tag,
 
     #[n(2)]
-    #[cbor(with = "crate::util::garr_cbor")]
+    #[cbor(with = "::upm_common::util::garr_cbor")]
     nonce: XNonce,
 
     #[n(3)]
@@ -69,13 +69,13 @@ where
     for<'a> T: Decode<'a, ()>,
     CBOR_MAX_LEN: ArrayLength,
 {
-    pub fn encrypt(item: &T, passwd: &[u8], rng: &mut impl CryptoRng) -> Result<Self, Error> {
+    pub fn encrypt(item: &T, passwd: &str, rng: &mut impl CryptoRng) -> Result<Self, Error> {
         let mut salt = [0u8; SALT_LEN];
         rng.fill_bytes(&mut salt);
 
         let mut key = Key::default();
         let round_count = DEFAULT_ROUND_COUNT;
-        pbkdf2_hmac::<Sha256>(passwd, &salt, round_count, &mut key);
+        pbkdf2_hmac::<Sha256>(passwd.as_bytes(), &salt, round_count, &mut key);
 
         let mut nonce = XNonce::default();
         rng.fill_bytes(&mut nonce);
@@ -96,9 +96,9 @@ where
         })
     }
 
-    pub fn decrypt(&self, passwd: &[u8]) -> Result<T, Error> {
+    pub fn decrypt(&self, passwd: &str) -> Result<T, Error> {
         let mut key = Key::default();
-        pbkdf2_hmac::<Sha256>(passwd, &self.salt, self.round_count, &mut key);
+        pbkdf2_hmac::<Sha256>(passwd.as_bytes(), &self.salt, self.round_count, &mut key);
 
         let mut data = self.data.clone();
         let cipher = XChaCha20Poly1305::new(&key);

@@ -4,5 +4,7 @@ pub use req::Req;
 pub use resp::Resp;
 
 pub mod info;
+pub mod model;
 pub mod req;
 pub mod resp;
+pub mod util;

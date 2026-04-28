@@ -9,11 +9,9 @@ use embassy_rp::{
 };
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, mutex::Mutex};
 use heapless::String;
-use log::info;
 use minicbor::{Decode, Encode};
-use typenum::U128;
 
-use crate::enc::PasswdEnc;
+use crate::query::QueryContext;
 
 mod blink;
 mod db;
@@ -48,25 +46,11 @@ async fn main(spawner: Spawner) {
     )
     .await;
 
-    let mut rng = RoscRng;
+    let rng = &mut RoscRng;
 
-    info!("START");
-    let smth_enc = PasswdEnc::<_, U128>::encrypt(
-        &Smth {
-            a: 42,
-            b: "Hello, world!".try_into().unwrap(),
-        },
-        b"Secret code",
-        &mut rng,
-    )
-    .unwrap();
+    let mut ctx = QueryContext { db, io, rng };
 
-    let smth = smth_enc.decrypt(b"Secret code").unwrap();
-    info!("{smth:?}");
-
-    // let mut ctx = QueryContext { db, io };
-    //
-    // query::listen(&mut ctx).await;
+    query::listen(&mut ctx).await;
 }
 
 #[derive(Encode, Decode, Debug)]

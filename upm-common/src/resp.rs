@@ -5,7 +5,7 @@ use minicbor::{Decode, Encode};
 // would be nice to use something like this instead:
 //     https://github.com/twittner/minicbor/pull/56/
 #[allow(non_camel_case_types)]
-pub type RESP_CBOR_MAX_LEN = typenum::U1024;
+pub type RESP_CBOR_MAX_LEN = typenum::U2048;
 
 /// A response is a message from a device to a PC.
 #[derive(Encode, Decode, From)]
@@ -15,7 +15,7 @@ pub enum Resp {
     Error(#[n(0)] ErrorResp),
 
     #[n(2)]
-    WrotePlain(#[n(0)] WrotePlainResp),
+    WroteKey(#[n(0)] WroteKeyResp),
 }
 
 #[derive(Encode, Decode)]
@@ -26,7 +26,7 @@ pub struct ErrorResp {
 }
 
 #[derive(Encode, Decode)]
-pub struct WrotePlainResp {
+pub struct WroteKeyResp {
     #[n(0)]
     pub id: u16,
 }

@@ -3,4 +3,4 @@ pub use send::{Cmd, send};
 
 mod context;
 mod send;
-mod write_plain;
+mod write_key;
