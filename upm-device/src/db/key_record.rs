@@ -12,11 +12,11 @@ pub struct KeyRecord {
     pub id: Id<KeyRecord>,
 
     #[n(1)]
-    #[cbor(with = "minicbor_adapters")]
+    #[cbor(with = "::minicbor_adapters")]
     pub name: String<64>,
 
     #[n(2)]
-    #[cbor(with = "minicbor_adapters")]
+    #[cbor(with = "::minicbor_adapters")]
     pub passwd_hint: String<64>,
 
     #[n(3)]
@@ -29,13 +29,13 @@ pub enum KeyRecordKind {
     #[n(0)]
     Bytes(
         #[n(0)]
-        #[cbor(with = "minicbor_adapters")]
+        #[cbor(with = "::minicbor_adapters")]
         Vec<u8, 1024>,
     ),
     #[n(1)]
     Text(
         #[n(0)]
-        #[cbor(with = "minicbor_adapters")]
+        #[cbor(with = "::minicbor_adapters")]
         String<256>,
     ),
 

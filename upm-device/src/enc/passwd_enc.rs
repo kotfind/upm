@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use chacha20poly1305::{AeadInPlace, KeyInit, XChaCha20Poly1305};
+use chacha20poly1305::{AeadInPlace, Key, KeyInit, Tag, XChaCha20Poly1305, XNonce};
 use generic_array::ArrayLength;
 use minicbor::{Decode, Encode};
 use pbkdf2::pbkdf2_hmac;
@@ -10,10 +10,7 @@ use thiserror::Error;
 
 use crate::util::gvec::{CapacityError, GVec};
 
-const AUTH_TAG_LEN: usize = 16;
 const SALT_LEN: usize = 16;
-const NONCE_LEN: usize = 24;
-const KEY_LEN: usize = 32;
 
 // TODO: increase to 100_000 for production
 const DEFAULT_ROUND_COUNT: u32 = 10;
@@ -49,10 +46,12 @@ where
     data: GVec<u8, CBOR_MAX_LEN>,
 
     #[n(1)]
-    auth_tag: [u8; AUTH_TAG_LEN],
+    #[cbor(with = "crate::util::garr_cbor")]
+    auth_tag: Tag,
 
     #[n(2)]
-    nonce: [u8; NONCE_LEN],
+    #[cbor(with = "crate::util::garr_cbor")]
+    nonce: XNonce,
 
     #[n(3)]
     salt: [u8; SALT_LEN],
@@ -74,20 +73,18 @@ where
         let mut salt = [0u8; SALT_LEN];
         rng.fill_bytes(&mut salt);
 
-        let mut key = [0u8; KEY_LEN];
+        let mut key = Key::default();
         let round_count = DEFAULT_ROUND_COUNT;
         pbkdf2_hmac::<Sha256>(passwd, &salt, round_count, &mut key);
 
-        let mut nonce = [0u8; NONCE_LEN];
+        let mut nonce = XNonce::default();
         rng.fill_bytes(&mut nonce);
 
         let mut data = GVec::<u8, CBOR_MAX_LEN>::new();
         minicbor::encode(item, &mut data)?;
 
-        let cipher = XChaCha20Poly1305::new(key.as_slice().into());
-        let auth_tag: [u8; AUTH_TAG_LEN] = cipher
-            .encrypt_in_place_detached(nonce.as_slice().into(), &[], &mut data)?
-            .into();
+        let cipher = XChaCha20Poly1305::new(&key);
+        let auth_tag = cipher.encrypt_in_place_detached(&nonce, &[], &mut data)?;
 
         Ok(Self {
             data,
@@ -100,17 +97,12 @@ where
     }
 
     pub fn decrypt(&self, passwd: &[u8]) -> Result<T, Error> {
-        let mut key = [0u8; KEY_LEN];
+        let mut key = Key::default();
         pbkdf2_hmac::<Sha256>(passwd, &self.salt, self.round_count, &mut key);
 
         let mut data = self.data.clone();
-        let cipher = XChaCha20Poly1305::new(key.as_slice().into());
-        cipher.decrypt_in_place_detached(
-            self.nonce.as_slice().into(),
-            &[],
-            &mut data,
-            self.auth_tag.as_slice().into(),
-        )?;
+        let cipher = XChaCha20Poly1305::new(&key);
+        cipher.decrypt_in_place_detached(&self.nonce, &[], &mut data, &self.auth_tag)?;
 
         let item = minicbor::decode(&data)?;
 
