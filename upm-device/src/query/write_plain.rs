@@ -4,7 +4,7 @@ use embassy_time::{Duration, Timer};
 use log::info;
 use upm_common::{req::WritePlainReq, resp::WrotePlainResp};
 
-use crate::{db::PlainRecord, query::QueryContext};
+use crate::{db::KeyRecord, query::QueryContext};
 
 pub async fn process<'a, F: Flash, M: RawMutex>(
     ctx: &mut QueryContext<'a, F, M>,
@@ -12,7 +12,7 @@ pub async fn process<'a, F: Flash, M: RawMutex>(
 ) {
     let mut wtx = ctx.db.wtx().await.unwrap();
 
-    let record = PlainRecord {
+    let record = KeyRecord {
         id: wtx.new_id().unwrap(),
         name: req.name,
         data: req.data,

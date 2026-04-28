@@ -1,5 +1,5 @@
 pub use init::init;
-pub use plain_record::PlainRecord;
+pub use key_record::KeyRecord;
 
 mod init;
-mod plain_record;
+mod key_record;

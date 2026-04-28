@@ -11,9 +11,9 @@ use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, mutex::Mutex};
 use heapless::String;
 use log::info;
 use minicbor::{Decode, Encode};
-use typenum::{U64, U128};
+use typenum::U128;
 
-use crate::{enc::PasswdEnc, query::QueryContext, util::gvec::GVec};
+use crate::enc::PasswdEnc;
 
 mod blink;
 mod db;

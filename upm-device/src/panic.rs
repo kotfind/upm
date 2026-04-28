@@ -3,7 +3,6 @@ use core::panic::PanicInfo;
 
 use embassy_rp::{
     Peripherals,
-    gpio::{Level, Output},
     uart::{self, Uart},
     watchdog::Watchdog,
 };

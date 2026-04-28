@@ -45,6 +45,7 @@ where
     CBOR_MAX_LEN: ArrayLength,
 {
     #[n(0)]
+    #[cbor(bound = "CBOR_MAX_LEN:")]
     data: GVec<u8, CBOR_MAX_LEN>,
 
     #[n(1)]
@@ -59,7 +60,7 @@ where
     #[n(4)]
     round_count: u32,
 
-    #[n(5)]
+    #[cbor(skip)]
     marker: PhantomData<T>,
 }
 
