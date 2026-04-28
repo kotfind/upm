@@ -1,28 +1,23 @@
 #![no_std]
 #![no_main]
 
-use core::hint::black_box;
-
 use embassy_executor::Spawner;
 use embassy_futures::join::join;
 use embassy_rp::{
-    Peri,
-    gpio::{Level, Output},
-    peripherals::PIN_25,
+    clocks::RoscRng,
     spi::{self, Spi},
 };
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, mutex::Mutex};
-use embassy_time::Timer;
-use heapless::{String, Vec};
+use heapless::String;
 use log::info;
 use minicbor::{Decode, Encode};
-use nameof::name_of;
-use rekv::{Entity, Id};
+use typenum::{U64, U128};
 
-use crate::{db::PlainRecord, query::QueryContext};
+use crate::{enc::PasswdEnc, query::QueryContext, util::gvec::GVec};
 
 mod blink;
 mod db;
+mod enc;
 mod hard_fault;
 mod io;
 mod panic;
@@ -53,7 +48,33 @@ async fn main(spawner: Spawner) {
     )
     .await;
 
-    let mut ctx = QueryContext { db, io };
+    let mut rng = RoscRng;
 
-    query::listen(&mut ctx).await;
+    info!("START");
+    let smth_enc = PasswdEnc::<_, U128>::encrypt(
+        &Smth {
+            a: 42,
+            b: "Hello, world!".try_into().unwrap(),
+        },
+        b"Secret code",
+        &mut rng,
+    )
+    .unwrap();
+
+    let smth = smth_enc.decrypt(b"Secret code").unwrap();
+    info!("{smth:?}");
+
+    // let mut ctx = QueryContext { db, io };
+    //
+    // query::listen(&mut ctx).await;
+}
+
+#[derive(Encode, Decode, Debug)]
+struct Smth {
+    #[n(0)]
+    a: i32,
+
+    #[n(1)]
+    #[cbor(with = "minicbor_adapters")]
+    b: String<64>,
 }

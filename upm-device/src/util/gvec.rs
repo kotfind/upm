@@ -1,16 +1,14 @@
-// TODO: This is the same file as in rekv crate.
-// Better to turn it into a separate crate.
-//
 #![allow(non_camel_case_types)] // for ArrayLength types
 
 use core::{
-    fmt,
+    fmt::{self, Debug},
     mem::MaybeUninit,
     ops::{Deref, DerefMut},
     slice,
 };
 
 use generic_array::{ArrayLength, GenericArray};
+use minicbor::{Decode, Encode};
 
 pub(crate) struct GVec<T, CAP: ArrayLength> {
     data: GenericArray<MaybeUninit<T>, CAP>,
@@ -66,8 +64,33 @@ impl<T, CAP: ArrayLength> GVec<T, CAP> {
         Ok(())
     }
 
+    pub fn try_push(&mut self, item: T) -> Result<(), CapacityError> {
+        if self.len + 1 > CAP::USIZE {
+            return Err(CapacityError);
+        }
+
+        self.data[self.len].write(item);
+        self.len += 1;
+
+        Ok(())
+    }
+
     pub fn len(&self) -> usize {
         self.len
+    }
+}
+
+impl<T: Clone, CAP: ArrayLength> Clone for GVec<T, CAP> {
+    fn clone(&self) -> Self {
+        let mut other = Self::new();
+        other.extend(self.deref());
+        other
+    }
+}
+
+impl<T: Debug, CAP: ArrayLength> fmt::Debug for GVec<T, CAP> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.deref().fmt(f)
     }
 }
 
@@ -76,6 +99,41 @@ impl<CAP: ArrayLength> minicbor::encode::Write for GVec<u8, CAP> {
 
     fn write_all(&mut self, buf: &[u8]) -> Result<(), Self::Error> {
         self.try_extend(buf)
+    }
+}
+
+impl<CAP: ArrayLength> AsRef<[u8]> for GVec<u8, CAP> {
+    fn as_ref(&self) -> &[u8] {
+        self.deref()
+    }
+}
+
+impl<CAP: ArrayLength> AsMut<[u8]> for GVec<u8, CAP> {
+    fn as_mut(&mut self) -> &mut [u8] {
+        self.deref_mut()
+    }
+}
+
+impl<CAP: ArrayLength> chacha20poly1305::aead::Buffer for GVec<u8, CAP> {
+    fn extend_from_slice(&mut self, other: &[u8]) -> chacha20poly1305::aead::Result<()> {
+        self.try_extend(other)
+            .map_err(|_| chacha20poly1305::aead::Error)
+    }
+
+    fn truncate(&mut self, len: usize) {
+        if self.len < len {
+            panic!("truncate shouldn't increase length");
+        }
+
+        self.len = len;
+    }
+}
+
+impl<T, CAP: ArrayLength> Drop for GVec<T, CAP> {
+    fn drop(&mut self) {
+        for i in 0..self.len {
+            unsafe { self.data[i].assume_init_drop() };
+        }
     }
 }
 
@@ -94,6 +152,44 @@ impl<T, CAP: ArrayLength> DerefMut for GVec<T, CAP> {
         let len = self.len();
         let ptr = self.data[..len].as_mut_ptr() as *mut T;
         unsafe { slice::from_raw_parts_mut(ptr, self.len()) }
+    }
+}
+
+impl<T, CAP: ArrayLength, CTX> Encode<CTX> for GVec<T, CAP>
+where
+    T: Encode<CTX>,
+{
+    fn encode<W: minicbor::encode::Write>(
+        &self,
+        e: &mut minicbor::Encoder<W>,
+        ctx: &mut CTX,
+    ) -> Result<(), minicbor::encode::Error<W::Error>> {
+        e.array(self.len as u64)?;
+        for elem in self.iter() {
+            e.encode_with(elem, ctx)?;
+        }
+        Ok(())
+    }
+}
+
+impl<'a, T, CAP: ArrayLength, CTX> Decode<'a, CTX> for GVec<T, CAP>
+where
+    T: Decode<'a, CTX>,
+{
+    fn decode(
+        d: &mut minicbor::Decoder<'a>,
+        ctx: &mut CTX,
+    ) -> Result<Self, minicbor::decode::Error> {
+        let mut this = Self::new();
+        let arr = d.array_iter_with::<CTX, T>(ctx)?;
+
+        for elem in arr {
+            let elem = elem?;
+            this.try_push(elem)
+                .map_err(|_| minicbor::decode::Error::message("CapacityError"))?;
+        }
+
+        Ok(this)
     }
 }
 
