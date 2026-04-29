@@ -1,0 +1,17 @@
+my-ToP:
+  type: article
+  title: '"USB Менеджер Паролей". Текст Программы'
+  author: 'Чубий С.А.'
+  date: 2026
+
+my-manual:
+  type: article
+  title: '"USB Менеджер Паролей". Руководство пользователя'
+  author: 'Чубий С.А.'
+  date: 2026
+
+my-checks:
+  type: article
+  title: '"USB Менеджер Паролей". Программа и методика испытаний'
+  author: 'Чубий С.А.'
+  date: 2026
