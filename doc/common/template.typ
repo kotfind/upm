@@ -256,6 +256,7 @@
         set par(
             justify: true,
             leading: 1em,
+            spacing: 2em,
         )
 
         set heading(numbering: "1.")
