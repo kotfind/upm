@@ -13,8 +13,8 @@
 = ТЕКСТ ПРОГРАММЫ
 
 Исходный код программы разделен на несколько GitHub-репозиториев:
-- #href("https://github.com/kotfind/w25") -- драйвер для чипа памяти.
-- #href("https://github.com/kotfind/rekv") -- реализация простой реляционной
+- #href("https://github.com/kotfind/w25") --- драйвер для чипа памяти.
+- #href("https://github.com/kotfind/rekv") --- реализация простой реляционной
     базы данных, обертка над библиотекой `ekv`.
-- #href("https://github.com/kotfind/upm") -- основной проект.
+- #href("https://github.com/kotfind/upm") --- основной проект.
     *Обратите внимание, что в репозитории содержится несколько веток.*
