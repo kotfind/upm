@@ -405,9 +405,10 @@ RP2040 @rp2040-hardware-design.
 
 = СПИСОК ИСТОЧНИКОВ
 
+#set par(spacing: 1em)
 #bibliography(
     "sources.yml",
-    style: "ieee", // FIXME
+    style: "gost-r-705-2008-numeric",
     full: true,
     title: none,
 )
