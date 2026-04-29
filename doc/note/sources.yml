@@ -1,0 +1,182 @@
+pico-datasheet:
+  type: Reference
+  title: "Raspberry Pi Pico Datasheet"
+  author: "Raspberry Pi Ltd"
+  date: 2024-10-15
+  url: https://pip-assets.raspberrypi.com/categories/610-raspberry-pi-pico/documents/RP-008307-DS-1-pico-datasheet.pdf
+
+rp2040-hardware-design:
+  type: report
+  title: "Hardware design with RP2040"
+  author: "Raspberry Pi Ltd"
+  date: 2023-06-14
+  url: "https://files.waveshare.com/upload/9/9d/Hardware_design_with_rp2040.pdf"
+  publisher: "Raspberry Pi Ltd"
+
+rp2040-datasheet:
+  type: report
+  title: "RP2040 Datasheet"
+  author: "Raspberry Pi Ltd"
+  date: 2025-02-20
+  url: "https://pip-assets.raspberrypi.com/categories/814-rp2040/documents/RP-008371-DS-1-rp2040-datasheet.pdf"
+  publisher: "Raspberry Pi Ltd"
+
+w25-chipdip:
+  type: web
+  title: "W25Q32JVSSIQ, Микросхема памяти FLASH 32МБит (4M x 8) SPI/QUAD [SOIC-8_208mi.] (25Q32JVSIQ) – купить оптом и в розницу"
+  author: "ChipDip"
+  url: "https://www.chipdip.ru/product/w25q32jvssiq-mikroshema-pamyati-flash-32mbit-4m-x-8-winbond-9000517886"
+  date: 2026-04-29
+  publisher: "ChipDip"
+
+w25-datasheet:
+  type: report
+  title: "W25Q32JV 3V 32M-BIT SERIAL FLASH MEMORY WITH DUAL, QUAD SPI"
+  author: "Winbond Electronics"
+  date: 2016-08-30
+  url: "https://static.chipdip.ru/lib/375/DOC030375120.pdf"
+  publisher: "Winbond Electronics"
+
+chachapoly-std:
+  type: article
+  title: "ChaCha20 and Poly1305 for IETF Protocols"
+  author: Nir, Y. and Langley, A.
+  date: 2018-06
+  institution: "RFC Editor"
+  number: "RFC 8439"
+  url: "https://www.rfc-editor.org/info/rfc8439"
+  doi: "10.17487/RFC8439"
+
+k256-std:
+  type: article
+  title: "SEC 2: Recommended Elliptic Curve Domain Parameters"
+  author: "Certicom Research"
+  date: 2010-01
+  institution: "Standards for Efficient Cryptography Group (SECG)"
+  number: "SEC 2, Version 2.0"
+  url: "https://www.secg.org/sec2-v2.pdf"
+
+my-w25:
+  type: misc
+  title: "w25"
+  author: "Чубий С. А."
+  date: 2026
+  url: "https://github.com/kotfind/w25"
+
+my-rekv:
+  type: misc
+  title: "rekv"
+  author: "Чубий С. А."
+  date: 2026
+  url: "https://github.com/kotfind/rekv"
+
+ekv:
+  type: misc
+  title: "ekv"
+  author: "simmsb"
+  version: "1.0.0"
+  url: "https://crates.io/crates/ekv"
+  repository: "https://github.com/simmsb/ekv"
+
+cbor-std:
+  type: report
+  title: "Concise Binary Object Representation (CBOR)"
+  author:
+    - "Bormann, C."
+    - "Hoffman, P."
+  date: 2020-11
+  url: "https://www.rfc-editor.org/rfc/rfc8949.html"
+  publisher: "Internet Engineering Task Force (IETF)"
+
+usb-std:
+  type: report
+  title: "Universal Serial Bus Specification Revision 2.0"
+  author: "USB Implementers Forum"
+  date: 2000-04-27
+  url: "http://www.poweredusb.org/pdf/usb20.pdf"
+
+crypto-alg-cmp:
+  type: article
+  title: "Comparative Performance Analysis of Lightweight Cryptographic Algorithms on Resource-Constrained IoT Platforms"
+  author:
+    - "Sorescu, Tiberius-George"
+    - "Chiriac, Vlad-Mihai"
+    - "Stoica, Mario-Alexandru"
+    - "Comsa, Ciprian-Romeo"
+    - "Soroaga, Iustin-Gabriel"
+    - "Contac, Alexandru"
+  date: 2025-09-20
+  journal:
+    title: "Sensors"
+    short: "Sensors"
+  volume: 25
+  issue: 18
+  doi: "10.3390/s25185887"
+  publisher: "MDPI"
+
+chachapoly-in-tls-std:
+  type: report
+  title: "ChaCha20-Poly1305 Cipher Suites for Transport Layer Security (TLS)"
+  author:
+    - "Langley, Adam"
+    - "Chang, Wan-Teh"
+    - "Mavrogiannopoulos, Nikos"
+    - "Strombergson, Joachim"
+    - "Josefsson, Simon"
+  date: 2016-06
+  serial-number:
+    rfc: "7905"
+    doi: "10.17487/RFC7905"
+    issn: "2070-1721"
+  url: "https://www.rfc-editor.org/rfc/rfc7905.html"
+  publisher: "Internet Engineering Task Force (IETF)"
+
+key-size-cmp:
+  type: report
+  title: "Recommendation for Key Management: Part 1 – General"
+  author: "Barker, Elaine"
+  date: 2020-05
+  series: "NIST Special Publication 800-57 Part 1 Revision 5"
+  publisher: "National Institute of Standards and Technology (NIST)"
+  doi: "10.6028/NIST.SP.800-57pt1r5"
+  url: "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf"
+
+bitcoin-algo:
+  type: article
+  title: "Diving into Alternate Elliptic Curves for Bitcoin: A Security Analysis"
+  author:
+    - "El Baraka, Mohammed"
+    - "Ezzouak, Siham"
+    - "Sow, Demba"
+  date: 2024-04-18
+  parent:
+    type: proceedings
+    title: "Proceedings of the 7th International Conference on Networking, Intelligent Systems and Security"
+    date: 2024
+    location: "Meknes AA Morocco"
+  publisher: "ACM"
+  doi: "10.1145/3659677.3659714"
+  url: "https://dl.acm.org/doi/10.1145/3659677.3659714"
+
+alt-rutoken:
+  type: web
+  title: "Рутокен - российское средство аутентификации"
+  author: "Актив"
+  url: "https://www.rutoken.ru/"
+
+alt-yubikey:
+  type: web
+  title: "Yubico Home"
+  author: "Yubico AB"
+  url: "https://www.yubico.com/"
+
+alt-opensk:
+  type: web
+  title: "OpenSK: a fully open-source security key implementation"
+  date: 2026-04-09
+  url: "https://www.open-electronics.org/opensk-a-fully-open-source-security-key-implementation/"
+
+alt-solokey:
+  type: web
+  title: "SoloKeys"
+  url: "https://solokeys.com/"
