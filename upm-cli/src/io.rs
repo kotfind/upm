@@ -25,14 +25,17 @@ pub enum Error {
     #[error("std::io")]
     StdIo(#[from] std::io::Error),
 
-    #[error("read timed out")]
-    ReadTimeout,
-
     #[error("cbor encode error")]
     CborEncode(#[from] minicbor::encode::Error<std::convert::Infallible>),
 
     #[error("cbor decode error")]
     CborDecode(#[from] minicbor::decode::Error),
+
+    #[error("read timed out")]
+    ReadTimeout,
+
+    #[error("device was not found")]
+    NoDevice,
 }
 
 pub struct Io {
@@ -48,7 +51,7 @@ impl Io {
                 use upm_common::info::*;
                 d.vendor_id() == VENDOR_ID && d.product_id() == PRODUCT_ID
             })
-            .expect("no device found");
+            .ok_or(Error::NoDevice)?;
 
         let device = di.open().await?;
         let iface = device.claim_interface(0).await?;

@@ -14,6 +14,9 @@ pub type QueryResult = Result<(), QueryError>;
 pub enum QueryError {
     #[error("internal error occured")]
     Internal,
+
+    #[error("{msg}")]
+    Custom { msg: String<128> },
 }
 
 impl From<QueryError> for Resp {
