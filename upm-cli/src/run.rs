@@ -13,12 +13,6 @@ pub enum Error {
 
     #[error("io error")]
     Io(#[from] io::Error),
-
-    #[error("dialoguer error")]
-    Dialoguer(#[from] dialoguer::Error),
-
-    #[error("unexpected response error")]
-    UnexpectedResponse,
 }
 
 #[derive(Parser)]

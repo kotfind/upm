@@ -13,3 +13,13 @@ pub fn print_error(mut e: &dyn Error) {
         }
     }
 }
+
+pub trait ToHeaplessString {
+    fn to_heapless_string<const CAP: usize>(&self) -> heapless::String<CAP>;
+}
+
+impl<T: AsRef<str>> ToHeaplessString for T {
+    fn to_heapless_string<const CAP: usize>(&self) -> heapless::String<CAP> {
+        self.as_ref().try_into().unwrap()
+    }
+}

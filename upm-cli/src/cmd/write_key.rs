@@ -1,64 +1,67 @@
 use dialoguer::{Input, Password, theme::ColorfulTheme};
 use upm_common::{Resp, model::KeyKind, req::WriteKeyReq, resp::WroteKeyResp};
 
-use crate::cmd::CmdContext;
+use crate::{
+    cmd::{
+        CmdContext,
+        error::{CmdError, CmdResult},
+    },
+    util::ToHeaplessString,
+};
 
-pub(super) async fn process(ctx: &mut CmdContext) {
+pub(super) async fn process(ctx: &mut CmdContext) -> CmdResult {
     let name = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Name")
-        .interact_text()
-        .unwrap();
+        .interact_text()?;
 
     let key = Password::with_theme(&ColorfulTheme::default())
         .with_prompt("Key")
-        .interact()
-        .unwrap();
+        .interact()?;
 
     let key_confirm = Password::with_theme(&ColorfulTheme::default())
         .with_prompt("Confirm Key")
-        .interact()
-        .unwrap();
+        .interact()?;
 
     if key_confirm != key {
-        panic!("key confirmation failed")
+        return Err(CmdError::Confirm {
+            field: "key".to_owned(),
+        });
     }
 
     let passwd = Password::with_theme(&ColorfulTheme::default())
         .with_prompt("Password")
-        .interact()
-        .unwrap();
+        .interact()?;
 
     let passwd_confirm = Password::with_theme(&ColorfulTheme::default())
         .with_prompt("Confirm Password")
-        .interact()
-        .unwrap();
+        .interact()?;
 
     if passwd_confirm != passwd {
-        panic!("password confirmation failed")
+        return Err(CmdError::Confirm {
+            field: "password".to_owned(),
+        });
     }
 
     let passwd_hint: String = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Password Hint")
-        .interact_text()
-        .unwrap();
+        .interact_text()?;
 
     ctx.io
         .send(WriteKeyReq {
             name,
-            passwd_hint: passwd_hint.as_str().try_into().unwrap(),
-            passwd: passwd.as_str().try_into().unwrap(),
-            kind: KeyKind::Text(key.as_str().try_into().unwrap()),
+            passwd_hint: passwd_hint.to_heapless_string(),
+            passwd: passwd.to_heapless_string(),
+            kind: KeyKind::Text(key.to_heapless_string()),
         })
-        .await
-        .unwrap();
+        .await?;
 
-    match ctx.io.listen().await.unwrap() {
+    match ctx.io.listen().await? {
         Resp::WroteKey(WroteKeyResp { id }) => {
             println!("Device wrote record with id={}", id);
         }
-        Resp::Error(_) => todo!(),
-        _ => {
-            panic!("got unexpected response")
-        }
+        Resp::Error(e) => Err(e)?,
+        _ => Err(CmdError::UnexpectedResponse)?,
     }
+
+    Ok(())
 }
