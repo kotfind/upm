@@ -28,7 +28,7 @@ pub enum KeyKind {
     ),
 }
 
-#[derive(Encode, Decode, Clone, Copy)]
+#[derive(Encode, Decode, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum KeyTy {
     #[n(0)]
     Bytes,

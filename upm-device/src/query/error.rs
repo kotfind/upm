@@ -52,3 +52,10 @@ impl From<io::Error> for QueryError {
         QueryError::Internal
     }
 }
+
+impl From<chacha20poly1305::Error> for QueryError {
+    fn from(e: chacha20poly1305::Error) -> Self {
+        error!("query error: chacha20poly1305: {e:?}");
+        QueryError::Internal
+    }
+}

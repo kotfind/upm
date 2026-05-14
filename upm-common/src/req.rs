@@ -1,5 +1,5 @@
 use derive_more::From;
-use heapless::String;
+use heapless::{String, Vec};
 use minicbor::{Decode, Encode};
 
 use crate::model::{KeyKind, KeyTy};
@@ -24,6 +24,9 @@ pub enum Req {
 
     #[n(4)]
     GenKey(#[n(0)] GenKeyReq),
+
+    #[n(7)]
+    EncodeData(#[n(0)] EncodeDataReq),
 }
 
 #[derive(Encode, Decode)]
@@ -78,4 +81,19 @@ pub struct GenKeyReq {
 
     #[n(3)]
     pub ty: KeyTy,
+}
+
+#[derive(Encode, Decode)]
+pub struct EncodeDataReq {
+    #[n(0)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub name: String<64>,
+
+    #[n(1)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub passwd: String<64>,
+
+    #[n(3)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub data: Vec<u8, 1024>,
 }

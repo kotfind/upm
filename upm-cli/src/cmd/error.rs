@@ -1,5 +1,5 @@
 use thiserror::Error;
-use upm_common::resp::ErrorResp;
+use upm_common::{model::KeyTy, resp::ErrorResp};
 
 use crate::io;
 
@@ -24,6 +24,9 @@ pub enum CmdError {
 
     #[error("got a response of an unexpected type from a device")]
     UnexpectedResponse,
+
+    #[error("the input is too big")]
+    InputTooBig,
 }
 
 impl From<ErrorResp> for CmdError {

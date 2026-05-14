@@ -5,7 +5,7 @@ use minicbor::{Decode, Encode};
 use nameof::name_of;
 use rekv::{Entity, Id, Rtx};
 use typenum::U2048;
-use upm_common::model::KeyKind;
+use upm_common::model::{KeyKind, KeyTy};
 
 use crate::enc::PasswdEnc;
 
@@ -79,6 +79,16 @@ impl From<KeyRecordKind> for KeyKind {
             KeyRecordKind::Bytes(bytes) => Self::Bytes(bytes),
             KeyRecordKind::ChaCha20Poly1305(key) => Self::ChaCha20Poly1305(key),
             KeyRecordKind::K256(key) => Self::K256(key),
+        }
+    }
+}
+
+impl From<&KeyRecordKind> for KeyTy {
+    fn from(kind: &KeyRecordKind) -> Self {
+        match kind {
+            KeyRecordKind::Bytes(_) => Self::Bytes,
+            KeyRecordKind::ChaCha20Poly1305(_) => Self::ChaCha20Poly1305,
+            KeyRecordKind::K256(_) => Self::K256,
         }
     }
 }
