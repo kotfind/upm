@@ -3,6 +3,7 @@ use error::{QueryError, QueryResult};
 pub use listen::listen;
 
 mod context;
+mod decode_data;
 mod encode_data;
 mod error;
 mod gen_key;

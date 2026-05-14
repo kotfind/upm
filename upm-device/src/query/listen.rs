@@ -4,7 +4,9 @@ use log::error;
 use rand::CryptoRng;
 use upm_common::Req;
 
-use crate::query::{QueryContext, encode_data, gen_key, get_key_data, get_key_meta, write_key};
+use crate::query::{
+    QueryContext, decode_data, encode_data, gen_key, get_key_data, get_key_meta, write_key,
+};
 
 pub async fn listen<'a, F: Flash, M: RawMutex, R: CryptoRng>(
     ctx: &mut QueryContext<'a, F, M, R>,
@@ -18,6 +20,7 @@ pub async fn listen<'a, F: Flash, M: RawMutex, R: CryptoRng>(
             Req::GetKeyData(r) => get_key_data::process(ctx, r).await,
             Req::GenKey(r) => gen_key::process(ctx, r).await,
             Req::EncodeData(r) => encode_data::process(ctx, r).await,
+            Req::DencodeData(r) => decode_data::process(ctx, r).await,
         };
 
         if let Err(e) = query_result

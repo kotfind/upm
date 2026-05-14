@@ -3,7 +3,6 @@ use ekv::flash::Flash;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use heapless::{String, Vec};
 use k256::ecdsa::SigningKey;
-use log::info;
 use rand::{CryptoRng, seq::IndexedRandom};
 use upm_common::{
     model::{KeyKind, KeyTy},

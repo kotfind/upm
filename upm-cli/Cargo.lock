@@ -1165,6 +1165,7 @@ dependencies = [
 name = "upm-cli"
 version = "0.1.0"
 dependencies = [
+ "chacha20poly1305",
  "clap",
  "console 0.16.3",
  "dialoguer",

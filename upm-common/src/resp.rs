@@ -31,6 +31,9 @@ pub enum Resp {
 
     #[n(8)]
     EncodedData(#[n(0)] EncodedDataResp),
+
+    #[n(9)]
+    DecodedData(#[n(0)] DecodedDataResp),
 }
 
 #[derive(Encode, Decode)]
@@ -76,6 +79,13 @@ pub struct EncodedDataResp {
     pub auth_tag: Tag,
 
     #[n(2)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub data: Vec<u8, 1024>,
+}
+
+#[derive(Encode, Decode)]
+pub struct DecodedDataResp {
+    #[n(0)]
     #[cbor(with = "::minicbor_adapters")]
     pub data: Vec<u8, 1024>,
 }

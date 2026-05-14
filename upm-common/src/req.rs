@@ -1,3 +1,4 @@
+use chacha20poly1305::{Tag, XNonce};
 use derive_more::From;
 use heapless::{String, Vec};
 use minicbor::{Decode, Encode};
@@ -27,6 +28,9 @@ pub enum Req {
 
     #[n(7)]
     EncodeData(#[n(0)] EncodeDataReq),
+
+    #[n(8)]
+    DencodeData(#[n(0)] DecodeDataReq),
 }
 
 #[derive(Encode, Decode)]
@@ -94,6 +98,29 @@ pub struct EncodeDataReq {
     pub passwd: String<64>,
 
     #[n(3)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub data: Vec<u8, 1024>,
+}
+
+#[derive(Encode, Decode)]
+pub struct DecodeDataReq {
+    #[n(0)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub name: String<64>,
+
+    #[n(1)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub passwd: String<64>,
+
+    #[n(2)]
+    #[cbor(with = "crate::util::garr_cbor")]
+    pub nonce: XNonce,
+
+    #[n(3)]
+    #[cbor(with = "crate::util::garr_cbor")]
+    pub auth_tag: Tag,
+
+    #[n(4)]
     #[cbor(with = "::minicbor_adapters")]
     pub data: Vec<u8, 1024>,
 }
