@@ -4,7 +4,6 @@ use core::fmt::Write;
 use ekv::flash::Flash;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use heapless::String;
-use log::info;
 use rand::CryptoRng;
 use upm_common::{req::DecodeDataReq, resp::DecodedDataResp};
 
@@ -45,7 +44,6 @@ pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
 
     let mut data = req.data;
 
-    info!("before: {}", data.len());
     if cipher
         .decrypt_in_place_detached(&req.nonce, &[], &mut data, &req.auth_tag)
         .is_err()
@@ -57,7 +55,6 @@ pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
         });
     }
 
-    info!("after: {}", data.len());
     ctx.io.send(DecodedDataResp { data }).await?;
 
     Ok(())
