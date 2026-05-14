@@ -1,6 +1,9 @@
 use clap::Subcommand;
 
-use crate::cmd::{CmdContext, decode_data, encode_data, gen_key, list_keys, read_key, write_key};
+use crate::cmd::{
+    CmdContext, decode_data, encode_data, gen_key, list_keys, read_key, sign_data, verify_data,
+    write_key,
+};
 
 #[derive(Subcommand, Clone)]
 // the variant names are turned into cli command names
@@ -18,11 +21,17 @@ pub enum Cmd {
     /// Encodes a file, using a symmetric key, stored in the device's memory.
     EncodeData,
 
-    /// Decodes a file, using a symmetric key, previously encoded with the same key.
+    /// Decodes a file, previously encoded with the same symmetric key.
     DecodeData,
 
     /// List names of all the keys.
     ListKeys,
+
+    /// Signs a file, using an asymmetric key, stored in the device's memory.
+    SignData,
+
+    /// Checks if the signature is correct.
+    VerifyData,
 }
 
 pub async fn send(ctx: &mut CmdContext, cmd: Cmd) {
@@ -33,6 +42,8 @@ pub async fn send(ctx: &mut CmdContext, cmd: Cmd) {
         Cmd::EncodeData => encode_data::process(ctx).await,
         Cmd::DecodeData => decode_data::process(ctx).await,
         Cmd::ListKeys => list_keys::process(ctx).await,
+        Cmd::SignData => sign_data::process(ctx).await,
+        Cmd::VerifyData => verify_data::process(ctx).await,
     };
 
     if let Err(e) = cmd_result {

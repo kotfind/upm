@@ -1,15 +1,14 @@
 use crate::{db::KeyRecordKind, query::QueryError};
-use chacha20poly1305::AeadInPlace;
-use chacha20poly1305::KeyInit;
-use chacha20poly1305::XChaCha20Poly1305;
-use chacha20poly1305::XNonce;
 use core::fmt::Write;
 use ekv::flash::Flash;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use heapless::String;
+use k256::{
+    ecdsa::{Signature, signature::Signer},
+    sha2::{Digest, Sha256},
+};
 use rand::CryptoRng;
-use upm_common::req::EncodeDataReq;
-use upm_common::resp::EncodedDataResp;
+use upm_common::{req::SignDataReq, resp::SignedDataResp};
 
 use crate::{
     db,
@@ -18,7 +17,7 @@ use crate::{
 
 pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
     ctx: &mut QueryContext<'a, F, M, R>,
-    req: EncodeDataReq,
+    req: SignDataReq,
 ) -> QueryResult {
     let rtx = ctx.db.rtx().await;
 
@@ -36,28 +35,18 @@ pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
         return Err(QueryError::Custom { msg });
     };
 
-    let KeyRecordKind::ChaCha20Poly1305(key) = kind else {
+    let KeyRecordKind::K256(key) = kind else {
         return Err(QueryError::Custom {
-            msg: "only symmetric keys are supported for this operation"
+            msg: "only asymmetric keys are supported for this operation"
                 .try_into()
                 .unwrap(),
         });
     };
 
-    let mut nonce = XNonce::default();
-    ctx.rng.fill_bytes(&mut nonce);
+    let hash = Sha256::digest(&req.data);
+    let sgn: Signature = key.sign(&hash);
 
-    let cipher = XChaCha20Poly1305::new(&key);
-    let mut data = req.data;
-    let auth_tag = cipher.encrypt_in_place_detached(&nonce, &[], &mut data)?;
-
-    ctx.io
-        .send(EncodedDataResp {
-            nonce,
-            auth_tag,
-            data,
-        })
-        .await?;
+    ctx.io.send(SignedDataResp { sgn }).await?;
 
     Ok(())
 }

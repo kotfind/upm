@@ -1,4 +1,4 @@
-//! A module to be used in minicbor's `#[cbor(with = "garr_cbor")]`
+//! A module to be used in minicbor's `#[cbor(with = "...")]`.
 
 // FIXME: use normal generic_array version
 use chacha20poly1305::aead::generic_array::{ArrayLength, GenericArray};

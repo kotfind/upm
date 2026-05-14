@@ -1178,6 +1178,7 @@ dependencies = [
  "file_picker",
  "heapless",
  "hex",
+ "k256",
  "minicbor",
  "nusb",
  "thiserror 2.0.18",

@@ -1,10 +1,10 @@
 //! A module to be used in minicbor's `#[cbor(with = "...")]`.
 
-use k256::{ecdsa::SigningKey, elliptic_curve::generic_array::GenericArray};
+use k256::{ecdsa::Signature, elliptic_curve::generic_array::GenericArray};
 use minicbor::{Decoder, Encoder};
 
 pub fn encode<W, CTX>(
-    this: &SigningKey,
+    this: &Signature,
     e: &mut Encoder<W>,
     ctx: &mut CTX,
 ) -> Result<(), minicbor::encode::Error<W::Error>>
@@ -24,7 +24,7 @@ where
 pub fn decode<'a, CTX>(
     d: &mut Decoder<'a>,
     ctx: &mut CTX,
-) -> Result<SigningKey, minicbor::decode::Error> {
+) -> Result<Signature, minicbor::decode::Error> {
     let mut bytes = GenericArray::default();
 
     let arr = d.array_iter_with(ctx)?;
@@ -32,6 +32,6 @@ pub fn decode<'a, CTX>(
         bytes[idx] = item?;
     }
 
-    let this = SigningKey::from_bytes(&bytes).unwrap();
+    let this = Signature::from_bytes(&bytes).unwrap();
     Ok(this)
 }

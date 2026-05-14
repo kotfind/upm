@@ -11,4 +11,6 @@ mod get_key_data;
 mod get_key_meta;
 mod list_keys;
 mod listen;
+mod sign_data;
+mod verify_data;
 mod write_key;

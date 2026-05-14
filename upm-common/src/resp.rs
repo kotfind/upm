@@ -1,6 +1,7 @@
 use chacha20poly1305::{Tag, XNonce};
 use derive_more::From;
 use heapless::{String, Vec};
+use k256::ecdsa::Signature;
 use minicbor::{Decode, Encode};
 
 use crate::model::KeyKind;
@@ -37,6 +38,12 @@ pub enum Resp {
 
     #[n(10)]
     ListedKey(#[n(0)] ListedKeyResp),
+
+    #[n(11)]
+    SignedData(#[n(0)] SignedDataResp),
+
+    #[n(12)]
+    VerifiedData(#[n(0)] VerifiedDataResp),
 }
 
 #[derive(Encode, Decode)]
@@ -105,4 +112,17 @@ pub enum ListedKeyResp {
     },
     #[n(1)]
     EndOfList,
+}
+
+#[derive(Encode, Decode)]
+pub struct SignedDataResp {
+    #[n(0)]
+    #[cbor(with = "crate::util::k256_signature_cbor")]
+    pub sgn: Signature,
+}
+
+#[derive(Encode, Decode)]
+pub struct VerifiedDataResp {
+    #[n(0)]
+    pub is_valid: bool,
 }

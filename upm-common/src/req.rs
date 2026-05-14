@@ -1,6 +1,7 @@
 use chacha20poly1305::{Tag, XNonce};
 use derive_more::From;
 use heapless::{String, Vec};
+use k256::ecdsa::Signature;
 use minicbor::{Decode, Encode};
 
 use crate::model::{KeyKind, KeyTy};
@@ -34,6 +35,12 @@ pub enum Req {
 
     #[n(9)]
     ListKeys(#[n(0)] ListKeysReq),
+
+    #[n(10)]
+    SignData(#[n(0)] SignDataReq),
+
+    #[n(11)]
+    VerifyData(#[n(0)] VerifyDataReq),
 }
 
 #[derive(Encode, Decode)]
@@ -130,3 +137,37 @@ pub struct DecodeDataReq {
 
 #[derive(Encode, Decode)]
 pub struct ListKeysReq;
+
+#[derive(Encode, Decode)]
+pub struct SignDataReq {
+    #[n(0)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub name: String<64>,
+
+    #[n(1)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub passwd: String<64>,
+
+    #[n(2)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub data: Vec<u8, 1024>,
+}
+
+#[derive(Encode, Decode)]
+pub struct VerifyDataReq {
+    #[n(0)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub name: String<64>,
+
+    #[n(1)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub passwd: String<64>,
+
+    #[n(2)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub data: Vec<u8, 1024>,
+
+    #[n(3)]
+    #[cbor(with = "crate::util::k256_signature_cbor")]
+    pub sgn: Signature,
+}
