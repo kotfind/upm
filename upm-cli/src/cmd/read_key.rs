@@ -39,8 +39,8 @@ pub(super) async fn process(ctx: &mut CmdContext) -> CmdResult {
 
     match data.kind {
         KeyKind::Bytes(bytes) => tokio::io::stdout().write_all(&bytes).await?,
-        KeyKind::ChaCha20Poly1305Key(key) => tokio::io::stdout().write_all(&key).await?,
-        KeyKind::K256Key(key) => tokio::io::stdout().write_all(&key.to_bytes()).await?,
+        KeyKind::ChaCha20Poly1305(key) => tokio::io::stdout().write_all(&key).await?,
+        KeyKind::K256(key) => tokio::io::stdout().write_all(&key.to_bytes()).await?,
     }
 
     Ok(())

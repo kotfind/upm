@@ -3,10 +3,9 @@ use embassy_sync::blocking_mutex::raw::RawMutex;
 use heapless::{String, Vec};
 use minicbor::{Decode, Encode};
 use nameof::name_of;
-use rand::CryptoRng;
 use rekv::{Entity, Id, Rtx};
 use typenum::U2048;
-use upm_common::{model::KeyKind, req::WriteKeyReq};
+use upm_common::model::KeyKind;
 
 use crate::enc::PasswdEnc;
 
@@ -38,14 +37,14 @@ pub enum KeyRecordKind {
     ),
 
     #[n(2)]
-    ChaCha20Poly1305Key(
+    ChaCha20Poly1305(
         #[n(0)]
         #[cbor(with = "::upm_common::util::garr_cbor")]
         chacha20poly1305::Key,
     ),
 
     #[n(3)]
-    K256Key(
+    K256(
         #[n(0)]
         #[cbor(with = "::upm_common::util::k256_signing_key_cbor")]
         k256::ecdsa::SigningKey,
@@ -64,32 +63,12 @@ impl Entity for KeyRecord {
     }
 }
 
-impl KeyRecord {
-    pub fn from_req(
-        WriteKeyReq {
-            name,
-            passwd_hint,
-            passwd,
-            kind,
-        }: WriteKeyReq,
-        id: Id<KeyRecord>,
-        rng: &mut impl CryptoRng,
-    ) -> Self {
-        Self {
-            id,
-            name,
-            passwd_hint,
-            kind: PasswdEnc::encrypt(&kind.into(), &passwd, rng).unwrap(),
-        }
-    }
-}
-
 impl From<KeyKind> for KeyRecordKind {
     fn from(kind: KeyKind) -> Self {
         match kind {
             KeyKind::Bytes(bytes) => Self::Bytes(bytes),
-            KeyKind::ChaCha20Poly1305Key(key) => Self::ChaCha20Poly1305Key(key),
-            KeyKind::K256Key(key) => Self::K256Key(key),
+            KeyKind::ChaCha20Poly1305(key) => Self::ChaCha20Poly1305(key),
+            KeyKind::K256(key) => Self::K256(key),
         }
     }
 }
@@ -98,8 +77,8 @@ impl From<KeyRecordKind> for KeyKind {
     fn from(kind: KeyRecordKind) -> Self {
         match kind {
             KeyRecordKind::Bytes(bytes) => Self::Bytes(bytes),
-            KeyRecordKind::ChaCha20Poly1305Key(key) => Self::ChaCha20Poly1305Key(key),
-            KeyRecordKind::K256Key(key) => Self::K256Key(key),
+            KeyRecordKind::ChaCha20Poly1305(key) => Self::ChaCha20Poly1305(key),
+            KeyRecordKind::K256(key) => Self::K256(key),
         }
     }
 }

@@ -24,6 +24,9 @@ pub enum Resp {
 
     #[n(4)]
     GotKeyData(#[n(0)] GotKeyDataResp),
+
+    #[n(5)]
+    GenedKey(#[n(0)] GenedKeyResp),
 }
 
 #[derive(Encode, Decode)]
@@ -50,4 +53,10 @@ pub struct GotKeyMetaResp {
 pub struct GotKeyDataResp {
     #[n(0)]
     pub kind: KeyKind,
+}
+
+#[derive(Encode, Decode)]
+pub struct GenedKeyResp {
+    #[n(0)]
+    pub id: u16,
 }

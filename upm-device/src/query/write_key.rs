@@ -8,6 +8,7 @@ use upm_common::{req::WriteKeyReq, resp::WroteKeyResp};
 
 use crate::{
     db::{self, KeyRecord},
+    enc::PasswdEnc,
     query::{QueryContext, QueryResult, error::QueryError},
 };
 
@@ -31,7 +32,13 @@ pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
         }
     }
 
-    let record = KeyRecord::from_req(req, wtx.new_id()?, ctx.rng);
+    let record = KeyRecord {
+        id: wtx.new_id()?,
+        name: req.name,
+        passwd_hint: req.passwd_hint,
+        kind: PasswdEnc::encrypt(&req.kind.into(), &req.passwd, ctx.rng).unwrap(),
+    };
+
     wtx.write(&record).await?;
     wtx.commit().await?;
 

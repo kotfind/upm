@@ -10,7 +10,7 @@ ignored = [
 
 [dependencies]
 chacha20poly1305 = { version = "0.10.1", default-features = false, features = [
-    "heapless"
+    "heapless",
 ] }
 cortex-m = "0.7.6"
 cortex-m-rt = "0.7.5"
@@ -24,7 +24,7 @@ embassy-futures = { version = "0.1.2", features = ["log"] }
 embassy-rp = { version = "0.9.0", features = [
     "critical-section-impl",
     "rp2040",
-    "time-driver",
+    "time-driver"
 ] }
 embassy-sync = { version = "0.7.2", features = ["log"] }
 embassy-time = "0.5.0"
@@ -46,7 +46,7 @@ pbkdf2 = { version = "0.13.0", default-features = false, features = [
     "sha2"
 ] }
 portable-atomic = { version = "1.13.1", features = ["critical-section"] }
-rand = { version = "0.9.4", default-features = false, features = ["log"] }
+rand = { version = "0.9.4", default-features = false }
 rekv = { git = "https://github.com/kotfind/rekv" }
 sha2 = { version = "0.11.0", default-features = false }
 static_cell = "2.1.1"
