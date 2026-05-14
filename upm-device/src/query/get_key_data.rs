@@ -23,6 +23,8 @@ pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
         return Err(QueryError::Custom { msg });
     };
 
+    ctx.cfm_io.confirm().await;
+
     let Ok(kind) = record.kind.decrypt(&req.passwd) else {
         let mut msg = String::new();
         let _ = write!(msg, "failed to decrypt `{}`", req.name);

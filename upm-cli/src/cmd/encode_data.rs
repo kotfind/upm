@@ -1,18 +1,19 @@
-use std::{fs, io::Read, path::PathBuf};
-
-use dialoguer::{Input, theme::ColorfulTheme};
+use dialoguer::{Input, Password, theme::ColorfulTheme};
 use file_picker::{Picker, PickerBuilder};
 use heapless::String;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tokio::io::AsyncWriteExt;
 use upm_common::{
-    Req, Resp,
+    Resp,
     req::{EncodeDataReq, GetKeyMetaReq},
     resp::EncodedDataResp,
 };
 
-use crate::cmd::{
-    CmdContext,
-    error::{CmdError, CmdResult},
+use crate::{
+    cmd::{
+        CmdContext,
+        error::{CmdError, CmdResult},
+    },
+    util::ToHeaplessString,
 };
 
 pub(super) async fn process(ctx: &mut CmdContext) -> CmdResult {
@@ -48,14 +49,14 @@ pub(super) async fn process(ctx: &mut CmdContext) -> CmdResult {
         return Err(CmdError::InputTooBig);
     };
 
-    let passwd = Input::with_theme(&ColorfulTheme::default())
+    let passwd = Password::with_theme(&ColorfulTheme::default())
         .with_prompt(format!("Password (hint: {})", meta.passwd_hint))
-        .interact_text()?;
+        .interact()?;
 
     ctx.io
         .send(EncodeDataReq {
             name,
-            passwd,
+            passwd: passwd.to_heapless_string()?,
             data: input_data,
         })
         .await?;

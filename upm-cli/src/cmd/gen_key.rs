@@ -42,7 +42,7 @@ pub(super) async fn process(ctx: &mut CmdContext) -> CmdResult {
         .send(GenKeyReq {
             name,
             passwd_hint,
-            passwd: passwd.to_heapless_string(),
+            passwd: passwd.to_heapless_string()?,
             ty,
         })
         .await?;

@@ -37,13 +37,13 @@ pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
         }
     }
 
-    let kind = gen_key(req.ty, ctx.rng);
+    let kind = gen_key(req.ty, &mut ctx.rng);
 
     let record = KeyRecord {
         id: wtx.new_id()?,
         name: req.name,
         passwd_hint: req.passwd_hint,
-        kind: PasswdEnc::encrypt(&kind.into(), &req.passwd, ctx.rng).unwrap(),
+        kind: PasswdEnc::encrypt(&kind.into(), &req.passwd, &mut ctx.rng).unwrap(),
     };
 
     wtx.write(&record).await?;

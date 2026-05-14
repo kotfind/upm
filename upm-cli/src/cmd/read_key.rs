@@ -1,4 +1,4 @@
-use dialoguer::{Input, theme::ColorfulTheme};
+use dialoguer::{Input, Password, theme::ColorfulTheme};
 use heapless::String;
 use tokio::io::AsyncWriteExt;
 use upm_common::{
@@ -7,9 +7,12 @@ use upm_common::{
     req::{GetKeyDataReq, GetKeyMetaReq},
 };
 
-use crate::cmd::{
-    CmdContext,
-    error::{CmdError, CmdResult},
+use crate::{
+    cmd::{
+        CmdContext,
+        error::{CmdError, CmdResult},
+    },
+    util::ToHeaplessString,
 };
 
 pub(super) async fn process(ctx: &mut CmdContext) -> CmdResult {
@@ -25,11 +28,16 @@ pub(super) async fn process(ctx: &mut CmdContext) -> CmdResult {
         _ => return Err(CmdError::UnexpectedResponse),
     };
 
-    let passwd = Input::with_theme(&ColorfulTheme::default())
+    let passwd = Password::with_theme(&ColorfulTheme::default())
         .with_prompt(format!("Password (hint: {})", meta.passwd_hint))
-        .interact_text()?;
+        .interact()?;
 
-    ctx.io.send(GetKeyDataReq { name, passwd }).await?;
+    ctx.io
+        .send(GetKeyDataReq {
+            name,
+            passwd: passwd.to_heapless_string()?,
+        })
+        .await?;
 
     let data = match ctx.io.listen().await? {
         Resp::GotKeyData(data) => data,

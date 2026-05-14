@@ -49,8 +49,8 @@ pub(super) async fn process(ctx: &mut CmdContext) -> CmdResult {
     ctx.io
         .send(WriteKeyReq {
             name,
-            passwd_hint: passwd_hint.to_heapless_string(),
-            passwd: passwd.to_heapless_string(),
+            passwd_hint: passwd_hint.to_heapless_string()?,
+            passwd: passwd.to_heapless_string()?,
             kind: KeyKind::Bytes(key.bytes().collect()),
         })
         .await?;

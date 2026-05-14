@@ -1,4 +1,5 @@
 pub use context::CmdContext;
+pub use error::CmdError;
 pub use send::{Cmd, send};
 
 mod context;

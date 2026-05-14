@@ -36,7 +36,7 @@ pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
         id: wtx.new_id()?,
         name: req.name,
         passwd_hint: req.passwd_hint,
-        kind: PasswdEnc::encrypt(&req.kind.into(), &req.passwd, ctx.rng).unwrap(),
+        kind: PasswdEnc::encrypt(&req.kind.into(), &req.passwd, &mut ctx.rng).unwrap(),
     };
 
     wtx.write(&record).await?;

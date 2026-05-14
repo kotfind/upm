@@ -4,9 +4,7 @@ use log::error;
 use rand::CryptoRng;
 use upm_common::Req;
 
-use crate::query::{
-    QueryContext, encode_data, error::QueryError, gen_key, get_key_data, get_key_meta, write_key,
-};
+use crate::query::{QueryContext, encode_data, gen_key, get_key_data, get_key_meta, write_key};
 
 pub async fn listen<'a, F: Flash, M: RawMutex, R: CryptoRng>(
     ctx: &mut QueryContext<'a, F, M, R>,
