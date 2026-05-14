@@ -7,6 +7,7 @@ mod decode_data;
 mod encode_data;
 mod error;
 mod gen_key;
+mod list_keys;
 mod read_key;
 mod send;
 mod write_key;

@@ -34,6 +34,9 @@ pub enum Resp {
 
     #[n(9)]
     DecodedData(#[n(0)] DecodedDataResp),
+
+    #[n(10)]
+    ListedKey(#[n(0)] ListedKeyResp),
 }
 
 #[derive(Encode, Decode)]
@@ -88,4 +91,18 @@ pub struct DecodedDataResp {
     #[n(0)]
     #[cbor(with = "::minicbor_adapters")]
     pub data: Vec<u8, 1024>,
+}
+
+// NOTE: I use custom enum instead of Option,
+// NOTE: because it's easier to derive Encode/ Decode for it.
+#[derive(Encode, Decode)]
+pub enum ListedKeyResp {
+    #[n(0)]
+    Key {
+        #[n(0)]
+        #[cbor(with = "::minicbor_adapters")]
+        name: String<64>,
+    },
+    #[n(1)]
+    EndOfList,
 }

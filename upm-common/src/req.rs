@@ -31,6 +31,9 @@ pub enum Req {
 
     #[n(8)]
     DencodeData(#[n(0)] DecodeDataReq),
+
+    #[n(9)]
+    ListKeys(#[n(0)] ListKeysReq),
 }
 
 #[derive(Encode, Decode)]
@@ -124,3 +127,6 @@ pub struct DecodeDataReq {
     #[cbor(with = "::minicbor_adapters")]
     pub data: Vec<u8, 1024>,
 }
+
+#[derive(Encode, Decode)]
+pub struct ListKeysReq;

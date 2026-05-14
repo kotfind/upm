@@ -9,5 +9,6 @@ mod error;
 mod gen_key;
 mod get_key_data;
 mod get_key_meta;
+mod list_keys;
 mod listen;
 mod write_key;
