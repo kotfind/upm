@@ -5,13 +5,16 @@ use embassy_executor::Spawner;
 use embassy_futures::join::join;
 use embassy_rp::{
     clocks::RoscRng,
+    gpio::{Level, Output},
     spi::{self, Spi},
 };
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, mutex::Mutex};
+use embassy_time::Timer;
 
-use crate::query::QueryContext;
+use crate::{confirm_io::ConfirmIo, query::QueryContext};
 
 mod blink;
+mod confirm_io;
 mod db;
 mod enc;
 mod hard_fault;
@@ -44,7 +47,16 @@ async fn main(spawner: Spawner) {
     )
     .await;
 
-    let rng = &mut RoscRng;
+    let mut confirm_io = ConfirmIo::new(p.PIN_5, p.PIN_6);
+    let mut led = Output::new(p.PIN_25, Level::Low);
 
-    query::listen(&mut QueryContext { db, io, rng }).await;
+    loop {
+        confirm_io.confirm().await;
+        led.toggle();
+        Timer::after_secs(1).await;
+    }
+
+    // let rng = &mut RoscRng;
+    //
+    // query::listen(&mut QueryContext { db, io, rng }).await;
 }
