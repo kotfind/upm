@@ -2,7 +2,6 @@ use core::fmt::Write;
 use ekv::flash::Flash;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use heapless::String;
-use log::info;
 use rand::CryptoRng;
 use upm_common::{req::WriteKeyReq, resp::WroteKeyResp};
 
@@ -42,7 +41,6 @@ pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
     wtx.write(&record).await?;
     wtx.commit().await?;
 
-    info!("wrote a record with id={:?}", record.id);
     ctx.io
         .send(WroteKeyResp {
             id: record.id.to_inner(),

@@ -6,9 +6,16 @@ use crate::cmd::{CmdContext, encode_data, gen_key, read_key, write_key};
 // the variant names are turned into cli command names
 #[allow(clippy::enum_variant_names)]
 pub enum Cmd {
+    /// Writes a new key to the device's memory.
     WriteKey,
-    ReadKey,
+
+    /// Randomly generates a key and writes it to the device's memory.
     GenKey,
+
+    /// Reads a key's data.
+    ReadKey,
+
+    /// Encodes a file, using a symmetric key, stored in the device's memory.
     EncodeData,
 }
 

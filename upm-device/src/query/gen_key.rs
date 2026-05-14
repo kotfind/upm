@@ -49,7 +49,6 @@ pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
     wtx.write(&record).await?;
     wtx.commit().await?;
 
-    info!("generated a record with id={:?}", record.id);
     ctx.io
         .send(GenedKeyResp {
             id: record.id.to_inner(),
