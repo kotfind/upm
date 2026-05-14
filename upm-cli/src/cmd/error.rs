@@ -16,6 +16,9 @@ pub enum CmdError {
     #[error("failed to communicate with device")]
     IO(#[from] io::Error),
 
+    #[error("system io failed")]
+    StdIO(#[from] std::io::Error),
+
     #[error("confirmation failed for `{field}`")]
     Confirm { field: String },
 

@@ -94,6 +94,16 @@ impl From<KeyKind> for KeyRecordKind {
     }
 }
 
+impl From<KeyRecordKind> for KeyKind {
+    fn from(kind: KeyRecordKind) -> Self {
+        match kind {
+            KeyRecordKind::Bytes(bytes) => Self::Bytes(bytes),
+            KeyRecordKind::ChaCha20Poly1305Key(key) => Self::ChaCha20Poly1305Key(key),
+            KeyRecordKind::K256Key(key) => Self::K256Key(key),
+        }
+    }
+}
+
 pub async fn get_key_record_by_name<'a, F: Flash, M: RawMutex>(
     name: &str,
     rtx: &Rtx<'a, F, M>,

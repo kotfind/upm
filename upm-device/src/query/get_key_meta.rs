@@ -3,7 +3,7 @@ use ekv::flash::Flash;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use heapless::String;
 use rand::CryptoRng;
-use upm_common::req::GetKeyMetaReq;
+use upm_common::{req::GetKeyMetaReq, resp::GotKeyMetaResp};
 
 use crate::{
     db,
@@ -25,5 +25,11 @@ pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
         return Err(QueryError::Custom { msg });
     };
 
-    todo!()
+    ctx.io
+        .send(GotKeyMetaResp {
+            passwd_hint: record.passwd_hint,
+        })
+        .await?;
+
+    Ok(())
 }

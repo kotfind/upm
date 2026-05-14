@@ -53,4 +53,8 @@ pub struct GetKeyDataReq {
     #[n(0)]
     #[cbor(with = "::minicbor_adapters")]
     pub name: String<64>,
+
+    #[n(2)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub passwd: String<64>,
 }

@@ -2,6 +2,8 @@ use derive_more::From;
 use heapless::String;
 use minicbor::{Decode, Encode};
 
+use crate::model::KeyKind;
+
 // would be nice to use something like this instead:
 //     https://github.com/twittner/minicbor/pull/56/
 #[allow(non_camel_case_types)]
@@ -18,7 +20,10 @@ pub enum Resp {
     WroteKey(#[n(0)] WroteKeyResp),
 
     #[n(3)]
-    GotKeyMeta(#[n(0)] KeyMetaResp),
+    GotKeyMeta(#[n(0)] GotKeyMetaResp),
+
+    #[n(4)]
+    GotKeyData(#[n(0)] GotKeyDataResp),
 }
 
 #[derive(Encode, Decode)]
@@ -35,8 +40,14 @@ pub struct WroteKeyResp {
 }
 
 #[derive(Encode, Decode)]
-pub struct KeyMetaResp {
+pub struct GotKeyMetaResp {
     #[n(0)]
     #[cbor(with = "::minicbor_adapters")]
     pub passwd_hint: String<64>,
+}
+
+#[derive(Encode, Decode)]
+pub struct GotKeyDataResp {
+    #[n(0)]
+    pub kind: KeyKind,
 }
