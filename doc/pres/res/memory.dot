@@ -1,0 +1,37 @@
+digraph G {
+    rankdir=LR;
+    bgcolor=transparent;
+    splines=ortho;
+
+    node [shape=box, style=filled, penwidth=1];
+
+    subgraph cluster_App {
+        label="Приложение";
+        style=filled;
+        fillcolor="#FFF8E7";
+        penwidth=1;
+        color="#8B7D6B";
+
+        subgraph cluster_rekv {
+            label="rekv";
+            style=filled;
+            fillcolor="#F0E6D2";
+            penwidth=1;
+            color="#A3967A";
+
+            subgraph cluster_ekv {
+                label="ekv";
+                style=filled;
+                fillcolor="#E6DFD0";
+                penwidth=1;
+                color="#B0A38A";
+
+                w25 [label="w25", fillcolor="#D9D0B5", penwidth=1];
+            }
+        }
+    }
+
+    Chip [label="Чип", shape=box, style=filled, fillcolor="#B0C4DE", penwidth=1];
+
+    w25 -> Chip [dir=both, penwidth=1, arrowhead="normal", arrowtail="normal", arrowsize=0.3];
+}

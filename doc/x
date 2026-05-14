@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+
+from os import chdir
+from click import argument, group, secho
+from pathlib import Path
+from duct import StatusError, cmd
+
+
+chdir(Path(__file__).absolute().parent)
+
+ROOT_PATH = Path(".").absolute()
+OUT_PATH = Path("out").absolute()
+
+# -------------------- Log --------------------
+
+
+def success(text):
+    secho(text, bold=True, fg="green")
+
+
+def error(text):
+    secho(text, bold=True, fg="red")
+
+
+# -------------------- Main --------------------
+
+
+def get_out_path(main_typ_path: Path) -> Path:
+    out_name = f"{main_typ_path.parent.name}.pdf"
+    return OUT_PATH.joinpath(out_name)
+
+
+def build_doc(main_typ_path: Path) -> None:
+    out_path = get_out_path(main_typ_path)
+
+    try:
+        cmd("typst", "compile", "--root", ROOT_PATH, main_typ_path, out_path).run()
+        success(f"Built `{out_path}`")
+    except StatusError:
+        error(f"Failed to build `{out_path}`")
+
+
+def watch_doc(main_typ_path: Path) -> None:
+    out_path = get_out_path(main_typ_path)
+
+    cmd("zathura", out_path).start()
+    cmd("typst", "watch", "--root", ROOT_PATH, main_typ_path, out_path).run()
+
+
+def resolve_paths(paths) -> list[Path]:
+    if not paths:
+        return list(ROOT_PATH.rglob("main.typ"))
+
+    return [Path(path).absolute().joinpath("main.typ") for path in paths]
+
+
+# -------------------- Cli --------------------
+
+
+@group(context_settings=dict(help_option_names=["-h", "--help"]))
+def x():
+    pass
+
+
+@x.command("build")
+@argument("paths", nargs=-1)
+def x_build(paths):
+    paths = resolve_paths(paths)
+    for path in paths:
+        build_doc(path)
+
+
+@x.command("watch")
+@argument("path")
+def x_watch(path):
+    path = Path(path).absolute()
+    watch_doc(path.joinpath("main.typ"))
+
+
+if __name__ == "__main__":
+    OUT_PATH.mkdir(exist_ok=True, parents=True)
+    x()
