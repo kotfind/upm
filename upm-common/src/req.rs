@@ -2,7 +2,7 @@ use derive_more::From;
 use heapless::String;
 use minicbor::{Decode, Encode};
 
-use crate::model::{KeyKind, KeyTy};
+use crate::model::{DataChunk, KeyKind, KeyTy};
 
 // would be nice to use something like this instead:
 //     https://github.com/twittner/minicbor/pull/56/
@@ -24,6 +24,15 @@ pub enum Req {
 
     #[n(4)]
     GenKey(#[n(0)] GenKeyReq),
+
+    #[n(5)]
+    DataChunk(#[n(0)] DataChunk),
+
+    #[n(6)]
+    EndOfData,
+
+    #[n(7)]
+    EncodeData(#[n(0)] EncodeDataReq),
 }
 
 #[derive(Encode, Decode)]
@@ -78,4 +87,15 @@ pub struct GenKeyReq {
 
     #[n(3)]
     pub ty: KeyTy,
+}
+
+#[derive(Encode, Decode)]
+pub struct EncodeDataReq {
+    #[n(0)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub name: String<64>,
+
+    #[n(2)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub passwd: String<64>,
 }

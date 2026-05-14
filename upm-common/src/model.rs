@@ -28,7 +28,7 @@ pub enum KeyKind {
     ),
 }
 
-#[derive(Encode, Decode, Clone, Copy)]
+#[derive(Encode, Decode, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum KeyTy {
     #[n(0)]
     Bytes,
@@ -54,4 +54,13 @@ impl fmt::Display for KeyTy {
 
 impl KeyTy {
     pub const ALL: &[Self] = &[Self::Bytes, Self::ChaCha20Poly1305, Self::K256];
+}
+
+pub const DATA_CHUNK_SIZE: usize = 1024;
+
+#[derive(Encode, Decode)]
+pub struct DataChunk {
+    #[n(0)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub data: Vec<u8, DATA_CHUNK_SIZE>,
 }

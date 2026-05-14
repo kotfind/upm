@@ -2,7 +2,7 @@ use derive_more::From;
 use heapless::String;
 use minicbor::{Decode, Encode};
 
-use crate::model::KeyKind;
+use crate::model::{DataChunk, KeyKind};
 
 // would be nice to use something like this instead:
 //     https://github.com/twittner/minicbor/pull/56/
@@ -27,6 +27,15 @@ pub enum Resp {
 
     #[n(5)]
     GenedKey(#[n(0)] GenedKeyResp),
+
+    #[n(6)]
+    DataChunk(#[n(0)] DataChunk),
+
+    #[n(7)]
+    EndOfData,
+
+    #[n(8)]
+    EncodeDataInitOk,
 }
 
 #[derive(Encode, Decode)]
