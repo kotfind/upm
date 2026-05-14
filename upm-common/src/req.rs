@@ -15,22 +15,42 @@ pub type REQ_CBOR_MAX_LEN = typenum::U2048;
 pub enum Req {
     #[n(1)]
     WriteKey(#[n(0)] WriteKeyReq),
+
+    #[n(2)]
+    GetKeyMeta(#[n(0)] GetKeyMetaReq),
+
+    #[n(3)]
+    GetKeyData(#[n(0)] GetKeyDataReq),
 }
 
 #[derive(Encode, Decode)]
 pub struct WriteKeyReq {
     #[n(0)]
-    #[cbor(with = "minicbor_adapters")]
+    #[cbor(with = "::minicbor_adapters")]
     pub name: String<64>,
 
     #[n(1)]
-    #[cbor(with = "minicbor_adapters")]
+    #[cbor(with = "::minicbor_adapters")]
     pub passwd_hint: String<64>,
 
     #[n(2)]
-    #[cbor(with = "minicbor_adapters")]
+    #[cbor(with = "::minicbor_adapters")]
     pub passwd: String<64>,
 
     #[n(3)]
     pub kind: KeyKind, // 1 Kb
+}
+
+#[derive(Encode, Decode)]
+pub struct GetKeyMetaReq {
+    #[n(0)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub name: String<64>,
+}
+
+#[derive(Encode, Decode)]
+pub struct GetKeyDataReq {
+    #[n(0)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub name: String<64>,
 }

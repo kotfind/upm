@@ -16,17 +16,27 @@ pub enum Resp {
 
     #[n(2)]
     WroteKey(#[n(0)] WroteKeyResp),
+
+    #[n(3)]
+    GotKeyMeta(#[n(0)] KeyMetaResp),
 }
 
 #[derive(Encode, Decode)]
 pub struct ErrorResp {
     #[n(0)]
-    #[cbor(with = "minicbor_adapters")]
-    pub text: String<1024>,
+    #[cbor(with = "::minicbor_adapters")]
+    pub text: String<128>,
 }
 
 #[derive(Encode, Decode)]
 pub struct WroteKeyResp {
     #[n(0)]
     pub id: u16,
+}
+
+#[derive(Encode, Decode)]
+pub struct KeyMetaResp {
+    #[n(0)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub passwd_hint: String<64>,
 }

@@ -1,8 +1,10 @@
+use ekv::flash::Flash;
+use embassy_sync::blocking_mutex::raw::RawMutex;
 use heapless::{String, Vec};
 use minicbor::{Decode, Encode};
 use nameof::name_of;
 use rand::CryptoRng;
-use rekv::{Entity, Id};
+use rekv::{Entity, Id, Rtx};
 use typenum::U2048;
 use upm_common::{model::KeyKind, req::WriteKeyReq};
 
@@ -34,18 +36,19 @@ pub enum KeyRecordKind {
         #[cbor(with = "::minicbor_adapters")]
         Vec<u8, 1024>,
     ),
-    #[n(1)]
-    Text(
-        #[n(0)]
-        #[cbor(with = "::minicbor_adapters")]
-        String<256>,
-    ),
 
     #[n(2)]
     ChaCha20Poly1305Key(
         #[n(0)]
         #[cbor(with = "::upm_common::util::garr_cbor")]
         chacha20poly1305::Key,
+    ),
+
+    #[n(3)]
+    K256Key(
+        #[n(0)]
+        #[cbor(with = "::upm_common::util::k256_signing_key_cbor")]
+        k256::ecdsa::SigningKey,
     ),
 }
 
@@ -85,8 +88,23 @@ impl From<KeyKind> for KeyRecordKind {
     fn from(kind: KeyKind) -> Self {
         match kind {
             KeyKind::Bytes(bytes) => Self::Bytes(bytes),
-            KeyKind::Text(text) => Self::Text(text),
             KeyKind::ChaCha20Poly1305Key(key) => Self::ChaCha20Poly1305Key(key),
+            KeyKind::K256Key(key) => Self::K256Key(key),
         }
     }
+}
+
+pub async fn get_key_record_by_name<'a, F: Flash, M: RawMutex>(
+    name: &str,
+    rtx: &Rtx<'a, F, M>,
+) -> Result<Option<KeyRecord>, rekv::Error<F>> {
+    let mut records = rtx.read_all::<KeyRecord>().await?;
+
+    while let Some(record) = records.next().await? {
+        if record.name == name {
+            return Ok(Some(record));
+        }
+    }
+
+    Ok(None)
 }

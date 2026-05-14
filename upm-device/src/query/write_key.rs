@@ -4,11 +4,10 @@ use embassy_sync::blocking_mutex::raw::RawMutex;
 use heapless::String;
 use log::info;
 use rand::CryptoRng;
-use rekv::Rtx;
 use upm_common::{req::WriteKeyReq, resp::WroteKeyResp};
 
 use crate::{
-    db::KeyRecord,
+    db::{self, KeyRecord},
     query::{QueryContext, QueryResult, error::QueryError},
 };
 
@@ -21,7 +20,7 @@ pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
     {
         let rtx = ctx.db.rtx().await;
 
-        if let Some(old_record) = get_key_record_by_name(&req.name, &rtx).await? {
+        if let Some(old_record) = db::get_key_record_by_name(&req.name, &rtx).await? {
             let mut msg = String::new();
             let _ = write!(
                 msg,
@@ -44,19 +43,4 @@ pub async fn process<'a, F: Flash, M: RawMutex, R: CryptoRng>(
         .await?;
 
     Ok(())
-}
-
-pub async fn get_key_record_by_name<'a, F: Flash, M: RawMutex>(
-    name: &str,
-    rtx: &Rtx<'a, F, M>,
-) -> Result<Option<KeyRecord>, QueryError> {
-    let mut records = rtx.read_all::<KeyRecord>().await?;
-
-    while let Some(record) = records.next().await? {
-        if record.name == name {
-            return Ok(Some(record));
-        }
-    }
-
-    Ok(None)
 }

@@ -1,4 +1,4 @@
-use heapless::{String, Vec};
+use heapless::Vec;
 use minicbor::{Decode, Encode};
 
 #[derive(Encode, Decode)]
@@ -10,17 +10,18 @@ pub enum KeyKind {
         #[cbor(with = "::minicbor_adapters")]
         Vec<u8, 1024>,
     ),
-    #[n(1)]
-    Text(
-        #[n(0)]
-        #[cbor(with = "::minicbor_adapters")]
-        String<256>,
-    ),
 
     #[n(2)]
     ChaCha20Poly1305Key(
         #[n(0)]
         #[cbor(with = "crate::util::garr_cbor")]
         chacha20poly1305::Key,
+    ),
+
+    #[n(3)]
+    K256Key(
+        #[n(0)]
+        #[cbor(with = "crate::util::k256_signing_key_cbor")]
+        k256::ecdsa::SigningKey,
     ),
 }

@@ -51,7 +51,7 @@ pub(super) async fn process(ctx: &mut CmdContext) -> CmdResult {
             name,
             passwd_hint: passwd_hint.to_heapless_string(),
             passwd: passwd.to_heapless_string(),
-            kind: KeyKind::Text(key.to_heapless_string()),
+            kind: KeyKind::Bytes(key.bytes().collect()),
         })
         .await?;
 
