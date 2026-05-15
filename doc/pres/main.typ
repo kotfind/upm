@@ -1,5 +1,7 @@
 #import "prelude.typ": *
 
+#set text(lang: "ru")
+
 #set table(
     align: left,
     inset: 9mm,
@@ -7,12 +9,17 @@
 
 #show: university-theme.with(
     aspect-ratio: "16-9",
+    align: center + horizon,
     config-info(
         title: [USB Менеджер Паролей],
         subtitle: [Курсовая работа],
         author: [Чубий Савва Андреевич],
     ),
+    config-common(
+        slide-level: 3,
+    ),
 )
+
 #title-slide(
     title: [Курсовая работа],
     subtitle: [USB Менеджер Паролей],

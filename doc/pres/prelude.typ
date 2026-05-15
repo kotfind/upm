@@ -8,4 +8,3 @@
 
 // dim
 #let d = text.with(fill: gray)
-
