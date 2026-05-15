@@ -41,6 +41,9 @@ pub enum Req {
 
     #[n(11)]
     VerifyData(#[n(0)] VerifyDataReq),
+
+    #[n(12)]
+    RemoveKey(#[n(0)] RemoveKeyReq),
 }
 
 #[derive(Encode, Decode)]
@@ -170,4 +173,11 @@ pub struct VerifyDataReq {
     #[n(3)]
     #[cbor(with = "crate::util::k256_signature_cbor")]
     pub sgn: Signature,
+}
+
+#[derive(Encode, Decode)]
+pub struct RemoveKeyReq {
+    #[n(0)]
+    #[cbor(with = "::minicbor_adapters")]
+    pub name: String<64>,
 }

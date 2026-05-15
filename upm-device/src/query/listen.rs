@@ -6,7 +6,7 @@ use upm_common::Req;
 
 use crate::query::{
     QueryContext, decode_data, encode_data, gen_key, get_key_data, get_key_meta, list_keys,
-    sign_data, verify_data, write_key,
+    remove_key, sign_data, verify_data, write_key,
 };
 
 pub async fn listen<'a, F: Flash, M: RawMutex, R: CryptoRng>(
@@ -25,6 +25,7 @@ pub async fn listen<'a, F: Flash, M: RawMutex, R: CryptoRng>(
             Req::ListKeys(r) => list_keys::process(ctx, r).await,
             Req::SignData(r) => sign_data::process(ctx, r).await,
             Req::VerifyData(r) => verify_data::process(ctx, r).await,
+            Req::RemoveKey(r) => remove_key::process(ctx, r).await,
         };
 
         if let Err(e) = query_result

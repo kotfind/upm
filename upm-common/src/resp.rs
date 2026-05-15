@@ -44,6 +44,9 @@ pub enum Resp {
 
     #[n(12)]
     VerifiedData(#[n(0)] VerifiedDataResp),
+
+    #[n(13)]
+    RemovedKey(#[n(0)] RemovedKeyResp),
 }
 
 #[derive(Encode, Decode)]
@@ -125,4 +128,10 @@ pub struct SignedDataResp {
 pub struct VerifiedDataResp {
     #[n(0)]
     pub is_valid: bool,
+}
+
+#[derive(Encode, Decode)]
+pub struct RemovedKeyResp {
+    #[n(0)]
+    pub id: u16,
 }

@@ -9,6 +9,7 @@ mod error;
 mod gen_key;
 mod list_keys;
 mod read_key;
+mod remove_key;
 mod send;
 mod sign_data;
 mod verify_data;

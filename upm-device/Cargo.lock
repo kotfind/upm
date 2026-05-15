@@ -1433,7 +1433,7 @@ checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
 [[package]]
 name = "rekv"
 version = "0.1.0"
-source = "git+https://github.com/kotfind/rekv#aa236d41925164bce9e3b290eee99640ff08c0cc"
+source = "git+https://github.com/kotfind/rekv#c1bac5d949acfd5eeb42adc3081e77a65e24101d"
 dependencies = [
  "ekv",
  "embassy-sync",

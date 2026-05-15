@@ -1,8 +1,8 @@
 use clap::Subcommand;
 
 use crate::cmd::{
-    CmdContext, decode_data, encode_data, gen_key, list_keys, read_key, sign_data, verify_data,
-    write_key,
+    CmdContext, decode_data, encode_data, gen_key, list_keys, read_key, remove_key, sign_data,
+    verify_data, write_key,
 };
 
 #[derive(Subcommand, Clone)]
@@ -32,6 +32,9 @@ pub enum Cmd {
 
     /// Checks if the signature is correct.
     VerifyData,
+
+    /// Removes a key from device memory.
+    RemoveKey,
 }
 
 pub async fn send(ctx: &mut CmdContext, cmd: Cmd) {
@@ -44,6 +47,7 @@ pub async fn send(ctx: &mut CmdContext, cmd: Cmd) {
         Cmd::ListKeys => list_keys::process(ctx).await,
         Cmd::SignData => sign_data::process(ctx).await,
         Cmd::VerifyData => verify_data::process(ctx).await,
+        Cmd::RemoveKey => remove_key::process(ctx).await,
     };
 
     if let Err(e) = cmd_result {
