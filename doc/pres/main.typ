@@ -15,9 +15,6 @@
         subtitle: [Курсовая работа],
         author: [Чубий Савва Андреевич],
     ),
-    config-common(
-        slide-level: 3,
-    ),
 )
 
 #title-slide(
