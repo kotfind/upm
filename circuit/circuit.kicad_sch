@@ -3565,7 +3565,7 @@
 		)
 		(uuid "6d3adf91-9ea5-48ba-bea3-d2d6c3787efe")
 	)
-	(text "Put C3 close\nto pin 45"
+	(text "Put C3 close\nto MCU pin"
 		(exclude_from_sim no)
 		(at 72.898 180.848 0)
 		(effects
@@ -3575,7 +3575,7 @@
 		)
 		(uuid "964a2baa-dbc7-48ef-b447-51ad22170bbd")
 	)
-	(text "Put C13 close\nto pin 44"
+	(text "Put C13 close\nto MCU pin\n"
 		(exclude_from_sim no)
 		(at 112.014 161.544 0)
 		(effects
@@ -3854,6 +3854,12 @@
 		(uuid "8981cffd-a1b6-4348-93e0-39179cf7a1d2")
 	)
 	(junction
+		(at 55.88 176.53)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "c1fac764-f0c8-4a1d-87f2-5efb10fbf563")
+	)
+	(junction
 		(at 82.55 173.99)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4074,6 +4080,16 @@
 			(type default)
 		)
 		(uuid "16f4bd00-eb2e-4d8e-a542-9b4a76da0d50")
+	)
+	(wire
+		(pts
+			(xy 55.88 171.45) (xy 55.88 176.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "171d768b-5910-48e7-acd6-0125a538cc1b")
 	)
 	(wire
 		(pts
@@ -5991,6 +6007,84 @@
 			(project "circuit"
 				(path "/8ff94e83-2bff-4482-b0f5-a16df1951a9e"
 					(reference "C11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 55.88 171.45 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "160e83ca-6690-4b5a-b705-39e3820e72ba")
+		(property "Reference" "#PWR021"
+			(at 55.88 175.26 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+3V3"
+			(at 55.88 166.37 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 55.88 171.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 55.88 171.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3V3\""
+			(at 55.88 171.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "7303c861-7a29-449a-b8a2-a830053e3b59")
+		)
+		(instances
+			(project "circuit"
+				(path "/8ff94e83-2bff-4482-b0f5-a16df1951a9e"
+					(reference "#PWR021")
 					(unit 1)
 				)
 			)
