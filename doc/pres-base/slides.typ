@@ -343,4 +343,9 @@
     #show: focus-slide
     #set align(center)
     Демонстрация
+
+    #place(horizon + center, dx: 3.2em, dy: -0.5em, image(
+        "res/squirrel.svg",
+        height: 0.8em,
+    ))
 ]
