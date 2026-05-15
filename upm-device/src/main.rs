@@ -41,7 +41,7 @@ async fn main(spawner: Spawner) {
 
     let (io, db) = join(
         usb::init(spawner, p.USB),
-        db::init(&memory_bus, memory_cs_pin, true),
+        db::init(&memory_bus, memory_cs_pin, false),
     )
     .await;
 
